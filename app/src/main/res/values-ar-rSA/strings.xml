@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">قرعة اليوم الذهبي</string>
+
+    <!-- Error messages -->
+    <string name="error_no_participants">الرجاء إضافة مشاركين</string>
+    <string name="error_min_participants">مطلوب مشاركان على الأقل</string>
+    <string name="error_duplicate_names">هناك مشاركون بنفس الاسم، يرجى استخدام أسماء مختلفة</string>
+    <string name="error_empty_names">هناك مشاركون بأسماء فارغة، يرجى ملء جميع الأسماء</string>
+    <string name="error_invalid_participant_count">عدد المشاركين غير صالح</string>
+    <string name="error_participant_count_mismatch">عدد المشاركين لا يتطابق مع المشاركين المُدخلين</string>
+    <string name="error_invalid_monthly_amount">المبلغ الشهري غير صالح</string>
+    <string name="error_invalid_duration">المدة غير صالحة</string>
+    <string name="error_missing_specific_item">الرجاء تحديد عنصر محدد</string>
+    <string name="error_invalid_start_month">شهر البدء غير صالح</string>
+    <string name="error_settings_not_found">الإعدادات غير موجودة، يرجى العودة إلى الصفحة الرئيسية</string>
+    <string name="error_unknown">حدث خطأ غير معروف</string>
+    <string name="error_server_500">خطأ في الخادم (500): يرجى المحاولة مرة أخرى لاحقًا</string>
+    <string name="error_server_502">خطأ في البوابة (502): يرجى المحاولة مرة أخرى لاحقًا</string>
+    <string name="error_server_503">الخدمة غير متوفرة (503): يرجى المحاولة مرة أخرى لاحقًا</string>
+    <string name="error_server_504">انتهت مهلة البوابة (504): يرجى المحاولة مرة أخرى لاحقًا</string>
+    <string name="error_server_generic">خطأ في الخادم: يرجى المحاولة مرة أخرى لاحقًا</string>
+
+    <!-- PDF related strings -->
+    <string name="draw_results_title">نتائج القرعة اليومية</string>
+    <string name="generated_date">تاريخ الإنشاء: %1$s</string>
+    <string name="month">الشهر</string>
+    <string name="participant_name">المشارك</string>
+    <string name="amount">المبلغ</string>
+    <string name="pdf_footer_text">تم إنشاء هذا المستند تلقائيًا بواسطة تطبيق القرعة اليومية. © 2023 جميع الحقوق محفوظة.</string>
+    <string name="no_pdf_viewer_installed">لم يتم العثور على عارض PDF. يرجى تثبيت عارض PDF.</string>
+    <string name="share_via">مشاركة عبر</string>
+</resources>
