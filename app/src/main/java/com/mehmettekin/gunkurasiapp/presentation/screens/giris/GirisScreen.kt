@@ -189,7 +189,7 @@ fun GirisContent(
         // Toplanacak şeyin cinsi
         item {
             Text(
-                text = "Toplanacak Değer Türü",
+                text = "Toplanacak Değerin Türü",
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.height(8.dp))
