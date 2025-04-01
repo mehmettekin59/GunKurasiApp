@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background Layer -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- Wheel Vector Drawable Background -->
+    <item>
+        <vector
+            android:width="108dp"
+            android:height="108dp"
+            android:viewportWidth="1080"
+            android:viewportHeight="1080">
+
+            <group
+                android:pivotX="540"
+                android:pivotY="540"
+                android:translateX="540"
+                android:translateY="540">
+
+                <!-- Shadow Effect -->
+                <path
+                    android:fillColor="#40000000"
+                    android:pathData="M 0 0 m -420 0 a 420 420 0 1 0 840 0 a 420 420 0 1 0 -840 0" />
+
+                <!-- Wheel Slices -->
+                <path
+                    android:fillColor="#FFF5CC"
+                    android:pathData="M 0 0 L 400 0 A 400 400 0 0 1 200 346.41 L 0 0 Z" />
+
+                <path
+                    android:fillColor="#FFD700"
+                    android:pathData="M 0 0 L 200 346.41 A 400 400 0 0 1 -200 346.41 L 0 0 Z" />
+
+                <path
+                    android:fillColor="#DAA520"
+                    android:pathData="M 0 0 L -200 346.41 A 400 400 0 0 1 -400 0 L 0 0 Z" />
+
+                <path
+                    android:fillColor="#004DB3"
+                    android:pathData="M 0 0 L -400 0 A 400 400 0 0 1 -200 -346.41 L 0 0 Z" />
+
+                <path
+                    android:fillColor="#001F45"
+                    android:pathData="M 0 0 L -200 -346.41 A 400 400 0 0 1 200 -346.41 L 0 0 Z" />
+
+                <path
+                    android:fillColor="#B8860B"
+                    android:pathData="M 0 0 L 200 -346.41 A 400 400 0 0 1 400 0 L 0 0 Z" />
+
+                <!-- Central White Circle -->
+                <path
+                    android:fillColor="#FFFFFF"
+                    android:pathData="M 0 0 m -120 0 a 120 120 0 1 0 240 0 a 120 120 0 1 0 -240 0"
+                    android:strokeColor="#B8860B"
+                    android:strokeWidth="4"/>
+
+                <!-- Inner Gold Circle -->
+                <path
+                    android:fillColor="#FFD700"
+                    android:pathData="M 0 0 m -115 0 a 115 115 0 1 0 230 0 a 115 115 0 1 0 -230 0" />
+            </group>
+        </vector>
+    </item>
+</layer-list>
