@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mehmettekin.gunkurasiapp.R
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
 import com.mehmettekin.gunkurasiapp.presentation.common.LoadingIndicator
 import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
@@ -85,7 +86,7 @@ fun SonucScreen(
     // Error handling
     LaunchedEffect(key1 = state.error) {
         state.error?.let { error ->
-            snackbarHostState.showSnackbar(error.asString())
+            snackbarHostState.showSnackbar(error.asString(context))
             viewModel.onEvent(SonucEvent.OnErrorDismiss)
         }
     }

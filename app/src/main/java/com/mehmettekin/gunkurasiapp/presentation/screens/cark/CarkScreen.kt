@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ fun CarkScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     // Navigation event handling
     LaunchedEffect(key1 = true) {
@@ -64,7 +66,8 @@ fun CarkScreen(
     // Error handling
     LaunchedEffect(key1 = state.error) {
         state.error?.let { error ->
-            snackbarHostState.showSnackbar(error.asString())
+
+            snackbarHostState.showSnackbar(error.asString(context))
             viewModel.onEvent(CarkEvent.OnErrorDismiss)
         }
     }

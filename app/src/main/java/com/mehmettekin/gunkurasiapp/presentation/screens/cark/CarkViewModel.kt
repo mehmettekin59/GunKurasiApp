@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mehmettekin.gunkurasiapp.R
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
 import com.mehmettekin.gunkurasiapp.domain.repository.DrawRepository
 import com.mehmettekin.gunkurasiapp.domain.usecase.GenerateDrawResultsUseCase

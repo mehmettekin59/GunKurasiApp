@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,11 +55,12 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     // Error handling
     LaunchedEffect(key1 = state.error) {
         state.error?.let { error ->
-            snackbarHostState.showSnackbar(error.asString())
+            snackbarHostState.showSnackbar(error.asString(context))
             viewModel.onEvent(SettingsEvent.OnErrorDismiss)
         }
     }

@@ -1,5 +1,6 @@
 package com.mehmettekin.gunkurasiapp.domain.usecase
 
+import com.mehmettekin.gunkurasiapp.R
 import com.mehmettekin.gunkurasiapp.domain.model.DrawSettings
 import com.mehmettekin.gunkurasiapp.domain.model.ItemType
 import com.mehmettekin.gunkurasiapp.util.ResultState

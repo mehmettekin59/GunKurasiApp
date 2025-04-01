@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mehmettekin.gunkurasiapp.domain.repository.KapalicarsiRepository
 import com.mehmettekin.gunkurasiapp.domain.repository.UserPreferencesRepository
+import com.mehmettekin.gunkurasiapp.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

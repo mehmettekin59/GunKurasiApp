@@ -40,4 +40,9 @@ object AppModule {
     ): DrawResultsDataStore {
         return DrawResultsDataStore(context, moshi)
     }
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
 }

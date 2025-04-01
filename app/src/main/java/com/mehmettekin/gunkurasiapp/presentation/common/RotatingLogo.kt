@@ -1,6 +1,7 @@
 package com.mehmettekin.gunkurasiapp.presentation.common
 
 import androidx.compose.animation.core.Animatable
+
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.mehmettekin.gunkurasiapp.R
 import kotlinx.coroutines.delay
 
 
@@ -60,7 +62,7 @@ fun RotatingLogo(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.app_logo),
+            painter = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = "App Logo",
             modifier = Modifier
                 .size(120.dp)

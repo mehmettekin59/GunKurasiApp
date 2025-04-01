@@ -1,6 +1,7 @@
 package com.mehmettekin.gunkurasiapp.data.repository
 
 
+import com.mehmettekin.gunkurasiapp.R
 import com.mehmettekin.gunkurasiapp.data.api.HttpErrorInterceptor
 import com.mehmettekin.gunkurasiapp.data.api.KapalicarsiApi
 import com.mehmettekin.gunkurasiapp.data.local.SettingsDataStore
@@ -52,7 +53,7 @@ class KapalicarsiRepositoryImpl @Inject constructor(
             } else {
                 val errorMessage = response.error?.message
                     ?: UiText.stringResource(R.string.error_unknown)
-                _currencies.value = ResultState.Error(UiText.dynamicString(errorMessage))
+                _currencies.value = ResultState.Error(UiText.dynamicString(errorMessage.toString()))
             }
         } catch (e: HttpErrorInterceptor.NoConnectivityException) {
             _currencies.value = ResultState.Error(UiText.dynamicString(e.message ?: "İnternet bağlantı hatası"))
@@ -77,7 +78,7 @@ class KapalicarsiRepositoryImpl @Inject constructor(
             } else {
                 val errorMessage = response.error?.message
                     ?: UiText.stringResource(R.string.error_unknown)
-                _gold.value = ResultState.Error(UiText.dynamicString(errorMessage))
+                _gold.value = ResultState.Error(UiText.dynamicString(errorMessage.toString()))
             }
         } catch (e: HttpErrorInterceptor.NoConnectivityException) {
             _gold.value = ResultState.Error(UiText.dynamicString(e.message ?: "İnternet bağlantı hatası"))

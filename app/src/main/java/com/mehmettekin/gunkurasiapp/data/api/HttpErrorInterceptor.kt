@@ -3,6 +3,7 @@ package com.mehmettekin.gunkurasiapp.data.api
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.mehmettekin.gunkurasiapp.R
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -52,12 +53,9 @@ class HttpErrorInterceptor @Inject constructor(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    class NoConnectivityException :
-        IOException(message = "İnternet bağlantısı bulunamadı. Lütfen bağlantınızı kontrol edin.")
+    class NoConnectivityException : IOException("İnternet bağlantısı bulunamadı. Lütfen bağlantınızı kontrol edin.")
 
-    class ServerException(message: String) :
-        IOException(message = message)
+    class ServerException(message: String) : IOException(message)
 
-    class TimeoutException :
-        IOException(message = "İstek zaman aşımına uğradı. Lütfen daha sonra tekrar deneyin.")
+    class TimeoutException : IOException("İstek zaman aşımına uğradı. Lütfen daha sonra tekrar deneyin.")
 }

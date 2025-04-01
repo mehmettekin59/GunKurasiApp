@@ -3,7 +3,6 @@ package com.mehmettekin.gunkurasiapp.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.ui.draw.DrawResult
 import androidx.core.content.FileProvider
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.kernel.colors.ColorConstants
@@ -17,6 +16,8 @@ import com.itextpdf.layout.element.Table
 import  com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.UnitValue
+import com.mehmettekin.gunkurasiapp.R
+import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
