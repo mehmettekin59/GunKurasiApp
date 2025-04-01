@@ -75,6 +75,12 @@ dependencies {
     //moshi-kotlin
     implementation(libs.moshi.kotlin)
 
+    //itext7
+    implementation(libs.itext7.core)
+
+    //Extanded Icons
+    implementation(libs.extended.icons)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

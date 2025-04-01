@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">GunKurasiApp</string>
+
+    <!-- Error messages -->
+    <string name="error_no_participants">Lütfen katılımcı ekleyin</string>
+    <string name="error_min_participants">En az 2 katılımcı gereklidir</string>
+    <string name="error_duplicate_names">Aynı isimde katılımcılar var, lütfen farklı isimler kullanın</string>
+    <string name="error_empty_names">Boş isimli katılımcılar var, lütfen tüm isimleri doldurun</string>
+    <string name="error_invalid_participant_count">Geçersiz katılımcı sayısı</string>
+    <string name="error_participant_count_mismatch">Katılımcı sayısı ile girilen katılımcılar uyuşmuyor</string>
+    <string name="error_invalid_monthly_amount">Geçersiz aylık miktar</string>
+    <string name="error_invalid_duration">Geçersiz süre</string>
+    <string name="error_missing_specific_item">Lütfen spesifik bir öğe seçin</string>
+    <string name="error_invalid_start_month">Geçersiz başlangıç ayı</string>
+    <string name="error_settings_not_found">Ayarlar bulunamadı, lütfen ana sayfaya dönün</string>
+    <string name="error_unknown">Bilinmeyen bir hata oluştu</string>
+    <string name="error_server_500">Sunucu hatası (500): Lütfen daha sonra tekrar deneyin</string>
+    <string name="error_server_502">Ağ geçidi hatası (502): Lütfen daha sonra tekrar deneyin</string>
+    <string name="error_server_503">Servis kullanılamıyor (503): Lütfen daha sonra tekrar deneyin</string>
+    <string name="error_server_504">Ağ geçidi zaman aşımı (504): Lütfen daha sonra tekrar deneyin</string>
+    <string name="error_server_generic">Sunucu hatası: Lütfen daha sonra tekrar deneyin</string>
+
+    <!-- PDF related strings -->
+    <string name="draw_results_title">GÜN KURASI SONUÇLARI</string>
+    <string name="generated_date">Oluşturulma Tarihi: %1$s</string>
+    <string name="month">Ay</string>
+    <string name="participant_name">Katılımcı</string>
+    <string name="amount">Miktar</string>
+    <string name="pdf_footer_text">Bu belge Gün Kurası App tarafından otomatik olarak oluşturulmuştur. © 2023 Tüm Hakları Saklıdır.</string>
+    <string name="no_pdf_viewer_installed">PDF görüntüleyici bulunamadı. Lütfen bir PDF görüntüleyici yükleyin.</string>
+    <string name="share_via">Şununla paylaş</string>
+
 </resources>

@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.mehmettekin.gunkurasiapp.presentation.navigation.NavGraph
 import com.mehmettekin.gunkurasiapp.ui.theme.GunKurasiAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +22,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             GunKurasiAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
+                    val navController = rememberNavController()
+                    NavGraph(navController = navController)
                 }
             }
         }
