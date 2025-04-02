@@ -218,7 +218,7 @@ class KapalicarsiRepositoryImpl @Inject constructor(
             code.contains("TEK", ignoreCase = true) && code.contains("YENI", ignoreCase = true) -> "Tam (Yeni)"
             code.contains("ATA", ignoreCase = true) && code.contains("ESKI", ignoreCase = true) -> "Ata (Eski)"
             code.contains("ATA", ignoreCase = true) && code.contains("YENI", ignoreCase = true) -> "Ata (Yeni)"
-            code.equals("ALTIN", ignoreCase = true) || code.contains("GRAM", ignoreCase = true) -> "Gram Altın"
+            code.equals("ALTIN", ignoreCase = true) || code.contains("ALTIN", ignoreCase = true) -> "Gram Altın"
             code.equals("ONS", ignoreCase = true) -> "Ons Altın"
             else -> code
         }
