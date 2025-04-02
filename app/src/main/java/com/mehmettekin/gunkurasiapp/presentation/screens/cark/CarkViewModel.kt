@@ -24,6 +24,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @HiltViewModel
 class CarkViewModel @Inject constructor(
     private val drawRepository: DrawRepository,

@@ -1,5 +1,6 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.giris
 
+import androidx.compose.foundation.BorderStroke
 import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -72,6 +73,7 @@ import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
 import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
 import com.mehmettekin.gunkurasiapp.ui.theme.Primary
 import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
+import com.mehmettekin.gunkurasiapp.ui.theme.White
 import com.mehmettekin.gunkurasiapp.util.Constants
 
 
@@ -154,10 +156,11 @@ fun GirisContent(
             .verticalScroll(rememberScrollState())
     ) {
         // Katılımcı sayısı
+
         OutlinedTextField(
             value = state.participantCount,
             onValueChange = { onEvent(GirisEvent.OnParticipantCountChange(it)) },
-            label = { Text("Katılımcı Sayısı") },
+            label = { Text("Katılımcı Sayısını Giriniz") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -165,13 +168,6 @@ fun GirisContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Katılımcı listesi
-        Text(
-            text = "Katılımcılar",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         // Katılımcı ekleme komponenti
         AddParticipantCard(onAddParticipant = { name ->
             onEvent(GirisEvent.OnAddParticipant(name))
@@ -183,7 +179,7 @@ fun GirisContent(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
+                .height(150.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
             if (state.participants.isEmpty()) {
@@ -209,7 +205,7 @@ fun GirisContent(
 
         // Toplanacak şeyin cinsi - Dropdown olarak değiştirildi
         Text(
-            text = "Toplanacak Değerin Türü",
+            text = "Seçiniz:",
             style = MaterialTheme.typography.titleLarge
         )
 
@@ -219,8 +215,6 @@ fun GirisContent(
             selectedItemType = state.selectedItemType,
             onItemTypeSelect = { onEvent(GirisEvent.OnItemTypeSelect(it)) }
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         // Döviz veya Altın seçiminde spesifik tür seçimi
         if (state.selectedItemType == ItemType.CURRENCY || state.selectedItemType == ItemType.GOLD) {
@@ -307,14 +301,15 @@ fun GirisContent(
             onYearSelected = { onEvent(GirisEvent.OnStartYearSelect(it)) }
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Devam butonu
         Button(
             onClick = { onEvent(GirisEvent.OnContinueClick) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(6.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Primary
             )
@@ -335,12 +330,15 @@ fun AddParticipantCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
+
+
+
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Katılımcı Adı") },
+                label = { Text("Katılımcı Adı Soyadı") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -354,11 +352,15 @@ fun AddParticipantCard(
                         name = ""
                     }
                 },
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(6.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Primary
+                )
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Ekle")
+                Icon(Icons.Default.Add, contentDescription = "Katılımcı Ekle", tint = White)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Ekle")
+                Text("Katılımcı Ekle")
             }
         }
     }
@@ -373,16 +375,18 @@ fun ParticipantCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(color = MaterialTheme.colorScheme.outline, width = 0.5.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp),
+                .padding(2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                 text = participant.name,
                 style = MaterialTheme.typography.bodyLarge
             )
