@@ -1,6 +1,5 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
-
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -10,10 +9,12 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,16 +59,20 @@ fun WheelOfFortune(
     var currentRotation by remember { mutableFloatStateOf(0f) }
     var targetRotation by remember { mutableFloatStateOf(0f) }
 
-    // Renkler listesi - daha fazla renk çeşitliliği için
+    // Renkler listesi - her katılımcı için benzersiz bir renk
     val sectionColors = listOf(
         NavyBlue,
         Gold,
-        Primary,
-        Secondary,
         Color(0xFF4CAF50), // Yeşil
         Color(0xFFF44336), // Kırmızı
         Color(0xFF9C27B0), // Mor
-        Color(0xFF2196F3)  // Mavi
+        Color(0xFF2196F3), // Mavi
+        Color(0xFFFF9800), // Turuncu
+        Color(0xFF795548), // Kahverengi
+        Color(0xFF607D8B), // Gri-Mavi
+        Color(0xFFE91E63), // Pembe
+        Color(0xFF009688), // Turkuaz
+        Color(0xFFFFEB3B)  // Sarı
     )
 
     // Calculate the angle for each participant
@@ -120,7 +125,7 @@ fun WheelOfFortune(
             val center = Offset(size.width / 2, size.height / 2)
             val radius = min(size.width, size.height) / 2
 
-            // Draw wheel sections
+            // Draw wheel sections with unique colors for each participant
             for (i in participants.indices) {
                 val startAngle = i * sliceAngle
                 val sectionColor = sectionColors[i % sectionColors.size]
@@ -144,12 +149,13 @@ fun WheelOfFortune(
                     cap = StrokeCap.Round
                 )
 
-                // Draw participant names - improved positioning
+                // Draw participant names with improved positioning
+                val nameAngle = startAngle + (sliceAngle / 2)
                 drawParticipantName(
                     textMeasurer = textMeasurer,
                     participant = participants[i],
-                    angle = startAngle + (sliceAngle / 2),
-                    radius = radius * 0.7f,
+                    angle = nameAngle,
+                    radius = radius,
                     center = center
                 )
             }
@@ -196,39 +202,34 @@ private fun DrawScope.drawParticipantName(
     radius: Float,
     center: Offset
 ) {
-    // Make the text size appropriate for the wheel
-    val fontSize = (radius * 0.12f).coerceAtLeast(12.sp.toPx()).coerceAtMost(18.sp.toPx())
+    // Calculate radial position
+    val angleInRadians = Math.toRadians(angle.toDouble())
+    val x = center.x + (radius * 0.6f * cos(angleInRadians)).toFloat()
+    val y = center.y + (radius * 0.6f * sin(angleInRadians)).toFloat()
 
-    // Measure text - enforcing white color
-    val textLayoutResult = textMeasurer.measure(
-        text = participant.name,
-        style = TextStyle(
-            fontSize = fontSize.toSp(),
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-        )
+    // Measure text
+    val textStyle = TextStyle(
+        fontSize = (radius * 0.1f).toSp(),
+        color = Color.White,
+        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        background = Color.Black.copy(alpha = 0.5f) // Background for better readability
     )
 
-    // Calculate position parameters
+    val textLayoutResult = textMeasurer.measure(
+        text = participant.name,
+        style = textStyle
+    )
+
+    // Get text dimensions
     val textWidth = textLayoutResult.size.width
     val textHeight = textLayoutResult.size.height
 
-    // Simpler approach: translate to center, rotate, then draw text at correct offset
-    translate(center.x, center.y) {
-        rotate(angle + 90) {
-            // Calculate offset from center for text placement
-            val xOffset = radius * 0.7f - textWidth / 2
-            val yOffset = -textHeight / 2
-
-            // Draw text with white color
-            drawText(
-                textLayoutResult = textLayoutResult,
-                topLeft = Offset(xOffset.toFloat(), yOffset.toFloat()),
-                color = Color.White
-            )
-        }
-    }
+    // Draw text at calculated position
+    drawText(
+        textLayoutResult = textLayoutResult,
+        topLeft = Offset(x - textWidth / 2, y - textHeight / 2)
+    )
 }
 
 private fun calculatePointOnCircle(center: Offset, radius: Float, angleInDegrees: Double): Offset {

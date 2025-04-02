@@ -152,20 +152,24 @@ fun GirisContent(
 ) {
     Column(
         modifier = modifier
-            .padding(16.dp)
+            .padding(8.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // Katılımcı sayısı
-
-        OutlinedTextField(
-            value = state.participantCount,
-            onValueChange = { onEvent(GirisEvent.OnParticipantCountChange(it)) },
-            label = { Text("Katılımcı Sayısını Giriniz") },
+        // Katılımcı sayısı giriş alanı
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            OutlinedTextField(
+                value = state.participantCount,
+                onValueChange = { onEvent(GirisEvent.OnParticipantCountChange(it)) },
+                label = { Text("Katılımcı Sayısını Giriniz") },
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Katılımcı listesi
         // Katılımcı ekleme komponenti
@@ -215,7 +219,7 @@ fun GirisContent(
             selectedItemType = state.selectedItemType,
             onItemTypeSelect = { onEvent(GirisEvent.OnItemTypeSelect(it)) }
         )
-
+        Spacer(modifier = Modifier.height(4.dp))
         // Döviz veya Altın seçiminde spesifik tür seçimi
         if (state.selectedItemType == ItemType.CURRENCY || state.selectedItemType == ItemType.GOLD) {
             Column {
@@ -224,7 +228,7 @@ fun GirisContent(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 when (state.selectedItemType) {
                     ItemType.CURRENCY -> {
@@ -262,7 +266,7 @@ fun GirisContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+     Spacer(modifier = Modifier.height(8.dp))
 
         // Aylık miktar
         OutlinedTextField(
@@ -273,7 +277,7 @@ fun GirisContent(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+       Spacer(modifier = Modifier.height(8.dp))
 
         // Süre (ay olarak)
         OutlinedTextField(
@@ -284,7 +288,7 @@ fun GirisContent(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Başlangıç ayı
         Text(

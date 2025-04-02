@@ -1,5 +1,7 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
+
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
@@ -24,7 +26,6 @@ import java.util.Locale
 import javax.inject.Inject
 
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @HiltViewModel
 class CarkViewModel @Inject constructor(
     private val drawRepository: DrawRepository,
@@ -109,6 +110,12 @@ class CarkViewModel @Inject constructor(
 
                 // Doğrudan animasyonu tamamlandı olarak işaretle
                 handleAnimationComplete()
+
+                // Son katılımcı atandığında, sonuç ekranına yönlendir
+                if (_state.value.currentDrawResults.size + 1 >= allDrawResults.size) {
+                    handleDrawComplete()
+                }
+
                 return
             }
 

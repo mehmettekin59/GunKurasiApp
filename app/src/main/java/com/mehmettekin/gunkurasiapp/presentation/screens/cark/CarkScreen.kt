@@ -71,8 +71,9 @@ fun CarkScreen(
     }
 
     // Handle animation completion
-    LaunchedEffect(key1 = state.animationCompleted, key2 = state.drawCompleted) {
-        if (state.animationCompleted && state.drawCompleted) {
+    LaunchedEffect(key1 = state.animationCompleted, key2 = state.drawCompleted, key3 = state.currentDrawResults.size) {
+        if ((state.animationCompleted && state.drawCompleted) ||
+            (state.remainingParticipants.size == 1 && state.currentDrawResults.size == state.settings?.participantCount?.minus(1))) {
             viewModel.onEvent(CarkEvent.OnDrawComplete)
         }
     }
