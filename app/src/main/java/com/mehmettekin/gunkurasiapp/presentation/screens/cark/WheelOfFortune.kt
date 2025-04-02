@@ -1,6 +1,7 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
-import androidx.compose.animation.core.FastOutSlowInEasing
+
+
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -22,7 +23,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -30,7 +30,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mehmettekin.gunkurasiapp.domain.model.Participant
@@ -39,7 +38,6 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 import android.util.Log
-import androidx.compose.ui.graphics.Shadow
 import kotlin.random.Random
 
 @Composable
@@ -103,8 +101,15 @@ fun WheelOfFortune(
                 // Normalize edilmiş açıyı hesapla ve ilet (0-360 arası)
                 val normalizedAngle = (currentRotation % 360 + 360) % 360
 
-                // DEBUG loglama
+                // Kazanan dilimi belirlemek için tüm dilimleri logla
                 Log.d("WheelOfFortune", "Animasyon bitti. Son açı: $normalizedAngle°")
+
+                // Her dilimin açı aralığını logla
+                for (i in participants.indices) {
+                    val startAngle = i * sliceAngle
+                    val endAngle = (i + 1) * sliceAngle
+                    Log.d("WheelOfFortune", "Dilim $i (${participants[i].name}): $startAngle° - $endAngle°")
+                }
 
                 // Son dönüş açısını ve animasyon tamamlandı olayını ilet
                 onRotationComplete(normalizedAngle)
@@ -142,13 +147,9 @@ fun WheelOfFortune(
             rotate(degrees = rotation, pivot = center) {
                 // 3. Her katılımcı için bir dilim çiz
                 participants.forEachIndexed { index, participant ->
+                    // Başlangıç açısı
                     val startAngle = index * sliceAngle
                     val segmentColor = segmentColors[index % segmentColors.size]
-
-                    // DEBUG: Dilim açılarını loglama
-                    if (!isSpinning && index == 0) {
-                        Log.d("WheelOfFortune", "Dilim $index (${participant.name}): $startAngle° - ${startAngle + sliceAngle}°")
-                    }
 
                     // 3.1. Dolu dilimi çiz
                     drawArc(
@@ -185,22 +186,17 @@ fun WheelOfFortune(
                         participant.name
                     }
 
-                    // 3.5. Metin stilini ve ölçülerini belirle
+                    // 3.5. Metin stilini ve ölçülerini belirle - Shadow olmadan
                     val textLayout = textMeasurer.measure(
                         text = displayText,
                         style = TextStyle(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            shadow = Shadow(
-                                color = Color.Black.copy(alpha = 0.7f),
-                                offset = Offset(1f, 1f),
-                                blurRadius = 1f
-                            )
+                            color = Color.Black // Siyah metin rengi kullanılıyor
                         )
                     )
 
-                    // 3.6. Metni çiz - tam ortalanmış olarak
+                    // 3.6. Metni çiz - Shadow olmadan sadece tek bir metin çizimi
                     drawText(
                         textLayoutResult = textLayout,
                         topLeft = Offset(
@@ -219,8 +215,6 @@ fun WheelOfFortune(
             )
 
             // 5. İşaretçi (sabit - yukarıda 0 derecede)
-            // Not: Bu işaretçi 0 derecede olduğu için (tam yukarıda)
-            // açı hesaplamaları buna uygun yapılmalıdır
             val pointerPath = Path().apply {
                 moveTo(center.x, 20.dp.toPx())
                 lineTo(center.x - 10.dp.toPx(), 0f)

@@ -131,33 +131,41 @@ class CarkViewModel @Inject constructor(
         // Dilim açısını hesapla
         val sliceAngle = 360f / participants.size
 
-        // DEBUG: Açı ve dilim bilgilerini logla
+        // Log: Temel bilgiler
         Log.d("CarkViewModel", "Normalize Açı: $normalizedAngle°, Dilim Açısı: $sliceAngle°, Katılımcı Sayısı: ${participants.size}")
 
-        // DOĞRU KAZANAN HESAPLAMA:
-        // 1. Önce şu anki açının hangi dilimde olduğunu belirle (0 derece yukarıda başlar)
-        val sliceNumber = (normalizedAngle / sliceAngle).toInt()
-
-        // 2. İşaretçi yukarıda (0°) olduğu için, açı arttıkça saat yönünde hareket eder
-        //    Ancak dilim numaraları TERS sırada artıyor (çarkı yukarıdan çizerken)
-        //    Bu yüzden toplam dilim sayısından çıkarıp mod almalıyız
-        val winnerIndex = (participants.size - sliceNumber) % participants.size
-
-        // Güvenlik kontrolü (indeks sınırlar içinde olmalı)
-        val safeIndex = winnerIndex.coerceIn(0, participants.size - 1)
-
-        // DEBUG: Kazananı logla
-        Log.d("CarkViewModel", "Dilim Numarası: $sliceNumber, Kazanan İndeks: $winnerIndex")
+        // KRİTİK DEĞİŞİKLİK: Açının hangi dilime denk geldiğini doğru hesapla
+        // Her bir dilimin açı aralığını kontrol ederek kazananı bul
+        var foundWinnerIndex = -1
         for (i in participants.indices) {
             val startAngle = i * sliceAngle
             val endAngle = (i + 1) * sliceAngle
-            Log.d("CarkViewModel", "Dilim $i (${participants[i].name}): $startAngle° - $endAngle°")
+
+            // Log: Her dilimin açı aralığı
+            Log.d("CarkViewModel", "Kontrol: Dilim $i (${participants[i].name}): $startAngle° - $endAngle°")
+
+            // Açının bu dilime denk gelip gelmediğini kontrol et
+            if (normalizedAngle >= startAngle && normalizedAngle < endAngle) {
+                foundWinnerIndex = i
+                Log.d("CarkViewModel", "BULUNAN KAZANAN: Açı $normalizedAngle, Dilim $i (${participants[i].name})")
+                break
+            }
         }
+
+        // Hiçbir dilim bulunamadıysa (360 derece tam sınırda), son dilime düşmüş sayalım
+        if (foundWinnerIndex == -1) {
+            foundWinnerIndex = participants.size - 1
+            Log.d("CarkViewModel", "Dilim bulunamadı, son dilim kullanılıyor: $foundWinnerIndex")
+        }
+
+        // Güvenlik kontrolü
+        val safeIndex = foundWinnerIndex.coerceIn(0, participants.size - 1)
 
         // Kazanan katılımcıyı belirle
         val winningParticipant = participants[safeIndex]
+        Log.d("CarkViewModel", "Kesin Kazanan: ${winningParticipant.name}")
 
-        // Kazanan katılımcıyı ve son dönüş açısını state'e kaydet
+        // Kazanan katılımcıyı state'e kaydet
         _state.update { it.copy(
             currentParticipant = winningParticipant,
             finalRotationAngle = normalizedAngle

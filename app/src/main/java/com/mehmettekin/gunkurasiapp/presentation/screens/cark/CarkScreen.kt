@@ -159,7 +159,7 @@ fun CarkContent(
                 participants = participants,
                 isSpinning = state.isSpinning,
                 onRotationComplete = { finalAngle ->
-                    // Çarkın son dönüş açısını ViewModel'e ilet
+                    // Çarkın son açısını ViewModel'e ilet
                     onEvent(CarkEvent.OnWheelRotationComplete(finalAngle))
                 },
                 onAnimationComplete = {
