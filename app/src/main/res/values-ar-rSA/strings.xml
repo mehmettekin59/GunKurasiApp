@@ -20,6 +20,8 @@
     <string name="error_server_503">الخدمة غير متوفرة (503): يرجى المحاولة مرة أخرى لاحقًا</string>
     <string name="error_server_504">انتهت مهلة البوابة (504): يرجى المحاولة مرة أخرى لاحقًا</string>
     <string name="error_server_generic">خطأ في الخادم: يرجى المحاولة مرة أخرى لاحقًا</string>
+    <string name="error_no_currencies_found">لم يتم العثور على بيانات العملة</string>
+    <string name="error_no_gold_found">لم يتم العثور على بيانات الخزينة</string>
 
     <!-- PDF related strings -->
     <string name="draw_results_title">نتائج القرعة اليومية</string>

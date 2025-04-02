@@ -19,6 +19,9 @@
     <string name="error_server_503">Servis kullanılamıyor (503): Lütfen daha sonra tekrar deneyin</string>
     <string name="error_server_504">Ağ geçidi zaman aşımı (504): Lütfen daha sonra tekrar deneyin</string>
     <string name="error_server_generic">Sunucu hatası: Lütfen daha sonra tekrar deneyin</string>
+    <string name="error_no_currencies_found">Döviz verileri bulunamadı</string>
+    <string name="error_no_gold_found">Altın verileri bulunamadı</string>
+
 
     <!-- PDF related strings -->
     <string name="draw_results_title">GÜN KURASI SONUÇLARI</string>
