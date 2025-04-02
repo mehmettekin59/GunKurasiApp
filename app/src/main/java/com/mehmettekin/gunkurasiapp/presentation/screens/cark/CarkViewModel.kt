@@ -1,28 +1,5 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.mehmettekin.gunkurasiapp.R
-import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
-import com.mehmettekin.gunkurasiapp.domain.repository.DrawRepository
-import com.mehmettekin.gunkurasiapp.domain.usecase.GenerateDrawResultsUseCase
-import com.mehmettekin.gunkurasiapp.domain.usecase.SaveDrawResultsUseCase
-import com.mehmettekin.gunkurasiapp.util.ResultState
-import com.mehmettekin.gunkurasiapp.util.UiText
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import javax.inject.Inject
-
 
 import android.os.Build
 import androidx.annotation.RequiresApi
