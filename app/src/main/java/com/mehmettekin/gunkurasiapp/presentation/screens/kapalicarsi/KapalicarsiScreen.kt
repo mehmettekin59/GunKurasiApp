@@ -49,9 +49,11 @@ import com.mehmettekin.gunkurasiapp.domain.model.Gold
 import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
 import com.mehmettekin.gunkurasiapp.ui.theme.Primary
 import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
+import com.mehmettekin.gunkurasiapp.util.Constants
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -239,6 +241,8 @@ fun LastUpdatedInfo(
 
 @Composable
 fun CurrencyCard(currency: Currency) {
+    val displayName = Constants.CurrencyCodes.getDisplayName(currency.code)
+
     Card(
         modifier = Modifier
             .size(width = 180.dp, height = 150.dp)
@@ -254,7 +258,7 @@ fun CurrencyCard(currency: Currency) {
             // Currency Name and Code
             Column {
                 Text(
-                    text = currency.name,
+                    text = displayName.ifEmpty { currency.name },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -311,6 +315,8 @@ fun CurrencyCard(currency: Currency) {
 
 @Composable
 fun GoldCard(gold: Gold) {
+    val displayName = Constants.GoldCodes.getDisplayName(gold.code)
+
     Card(
         modifier = Modifier
             .size(width = 180.dp, height = 150.dp)
@@ -329,7 +335,7 @@ fun GoldCard(gold: Gold) {
             // Gold Name and Code
             Column {
                 Text(
-                    text = gold.name,
+                    text = displayName.ifEmpty { gold.name },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )

@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.time.YearMonth
 import javax.inject.Inject
 
-@HiltViewModel
+@@HiltViewModel
 class GirisViewModel @Inject constructor(
     private val drawRepository: DrawRepository,
     private val kapalicarsiRepository: KapalicarsiRepository,
@@ -43,7 +43,7 @@ class GirisViewModel @Inject constructor(
             startYear = currentDate.year
         ) }
 
-        // Set currency and gold options
+        // Set currency and gold options from Constants
         _state.update { it.copy(
             currencyOptions = Constants.CurrencyCodes.CURRENCY_LIST,
             goldOptions = Constants.GoldCodes.GOLD_LIST
@@ -72,20 +72,8 @@ class GirisViewModel @Inject constructor(
         if (count.isEmpty() || count.toIntOrNull() != null) {
             _state.update { it.copy(participantCount = count) }
 
-            // Update participants list size
-            val countInt = count.toIntOrNull() ?: 0
-            val currentParticipants = _state.value.participants
-
-            if (countInt > currentParticipants.size) {
-                // Add more empty participants
-                val additionalParticipants = (1..(countInt - currentParticipants.size)).map {
-                    Participant(name = "")
-                }
-                _state.update { it.copy(participants = currentParticipants + additionalParticipants) }
-            } else if (countInt < currentParticipants.size) {
-                // Remove excess participants
-                _state.update { it.copy(participants = currentParticipants.take(countInt)) }
-            }
+            // No longer automatically create empty participants based on count
+            // The user should explicitly add participants
         }
     }
 
@@ -94,7 +82,7 @@ class GirisViewModel @Inject constructor(
             val updatedParticipants = _state.value.participants.toMutableList()
             updatedParticipants.add(Participant(name = name))
 
-            // Update participant count if needed
+            // Update participant count to match the actual number of participants
             val countStr = (updatedParticipants.size).toString()
 
             _state.update { it.copy(

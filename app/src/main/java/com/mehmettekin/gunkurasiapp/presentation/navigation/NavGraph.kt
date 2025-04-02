@@ -1,4 +1,4 @@
-package com.mehmettekin.gunkurasiapp.presentation.navigation
+    package com.mehmettekin.gunkurasiapp.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

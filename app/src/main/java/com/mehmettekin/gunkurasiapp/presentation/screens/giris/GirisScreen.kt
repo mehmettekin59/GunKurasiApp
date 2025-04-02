@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -41,7 +43,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -61,7 +62,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -72,6 +72,7 @@ import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
 import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
 import com.mehmettekin.gunkurasiapp.ui.theme.Primary
 import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
+import com.mehmettekin.gunkurasiapp.util.Constants
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,160 +148,178 @@ fun GirisContent(
     onEvent: (GirisEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         // Katılımcı sayısı
-        item {
-            OutlinedTextField(
-                value = state.participantCount,
-                onValueChange = { onEvent(GirisEvent.OnParticipantCountChange(it)) },
-                label = { Text("Katılımcı Sayısı") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-        }
+        OutlinedTextField(
+            value = state.participantCount,
+            onValueChange = { onEvent(GirisEvent.OnParticipantCountChange(it)) },
+            label = { Text("Katılımcı Sayısı") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Katılımcı listesi
-        item {
-            Text(
-                text = "Katılımcılar",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        Text(
+            text = "Katılımcılar",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Katılımcı ekleme komponenti
-        item {
-            AddParticipantCard(onAddParticipant = { name ->
-                onEvent(GirisEvent.OnAddParticipant(name))
-            })
-        }
+        AddParticipantCard(onAddParticipant = { name ->
+            onEvent(GirisEvent.OnAddParticipant(name))
+        })
 
-        // Katılımcı kartları
-        items(state.participants) { participant ->
-            ParticipantCard(
-                participant = participant,
-                onRemove = { onEvent(GirisEvent.OnRemoveParticipant(participant)) }
-            )
-        }
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Toplanacak şeyin cinsi
-        item {
-            Text(
-                text = "Toplanacak Değerin Türü",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onEvent(GirisEvent.OnItemTypeSelect(ItemType.TL)) }
+        // Katılımcı kartları - sabit yükseklikte ve kaydırılabilir alan
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            if (state.participants.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    RadioButton(
-                        selected = state.selectedItemType == ItemType.TL,
-                        onClick = { onEvent(GirisEvent.OnItemTypeSelect(ItemType.TL)) }
-                    )
-                    Text("Türk Lirası (TL)")
+                    Text("Henüz katılımcı eklenmedi")
                 }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onEvent(GirisEvent.OnItemTypeSelect(ItemType.CURRENCY)) }
-                ) {
-                    RadioButton(
-                        selected = state.selectedItemType == ItemType.CURRENCY,
-                        onClick = { onEvent(GirisEvent.OnItemTypeSelect(ItemType.CURRENCY)) }
-                    )
-                    Text("Döviz")
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onEvent(GirisEvent.OnItemTypeSelect(ItemType.GOLD)) }
-                ) {
-                    RadioButton(
-                        selected = state.selectedItemType == ItemType.GOLD,
-                        onClick = { onEvent(GirisEvent.OnItemTypeSelect(ItemType.GOLD)) }
-                    )
-                    Text("Altın")
+            } else {
+                LazyColumn {
+                    items(state.participants) { participant ->
+                        ParticipantCard(
+                            participant = participant,
+                            onRemove = { onEvent(GirisEvent.OnRemoveParticipant(participant)) }
+                        )
+                    }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Toplanacak şeyin cinsi - Dropdown olarak değiştirildi
+        Text(
+            text = "Toplanacak Değerin Türü",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        ItemTypeDropdown(
+            selectedItemType = state.selectedItemType,
+            onItemTypeSelect = { onEvent(GirisEvent.OnItemTypeSelect(it)) }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Döviz veya Altın seçiminde spesifik tür seçimi
-        item {
-            if (state.selectedItemType == ItemType.CURRENCY || state.selectedItemType == ItemType.GOLD) {
-                Column {
-                    Text(
-                        text = if (state.selectedItemType == ItemType.CURRENCY) "Döviz Türü" else "Altın Türü",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+        if (state.selectedItemType == ItemType.CURRENCY || state.selectedItemType == ItemType.GOLD) {
+            Column {
+                Text(
+                    text = if (state.selectedItemType == ItemType.CURRENCY) "Döviz Türü" else "Altın Türü",
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-                    DropdownSelector(
-                        selectedValue = state.selectedSpecificItem,
-                        options = if (state.selectedItemType == ItemType.CURRENCY) state.currencyOptions else state.goldOptions,
-                        onValueSelected = { onEvent(GirisEvent.OnSpecificItemSelect(it)) },
-                        placeholder = if (state.selectedItemType == ItemType.CURRENCY) "Döviz seçiniz" else "Altın çeşidi seçiniz"
-                    )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                when (state.selectedItemType) {
+                    ItemType.CURRENCY -> {
+                        val options = state.currencyOptions.map { Constants.CurrencyCodes.getDisplayName(it) }
+                        val selectedValue = if (state.selectedSpecificItem.isNotEmpty())
+                            Constants.CurrencyCodes.getDisplayName(state.selectedSpecificItem) else ""
+
+                        DropdownSelector(
+                            selectedValue = selectedValue,
+                            options = options,
+                            onValueSelected = { displayName ->
+                                val code = Constants.CurrencyCodes.getCodeFromDisplayName(displayName)
+                                onEvent(GirisEvent.OnSpecificItemSelect(code))
+                            },
+                            placeholder = "Döviz seçiniz"
+                        )
+                    }
+                    ItemType.GOLD -> {
+                        val options = state.goldOptions.map { Constants.GoldCodes.getDisplayName(it) }
+                        val selectedValue = if (state.selectedSpecificItem.isNotEmpty())
+                            Constants.GoldCodes.getDisplayName(state.selectedSpecificItem) else ""
+
+                        DropdownSelector(
+                            selectedValue = selectedValue,
+                            options = options,
+                            onValueSelected = { displayName ->
+                                val code = Constants.GoldCodes.getCodeFromDisplayName(displayName)
+                                onEvent(GirisEvent.OnSpecificItemSelect(code))
+                            },
+                            placeholder = "Altın çeşidi seçiniz"
+                        )
+                    }
+                    else -> {}
                 }
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Aylık miktar
-        item {
-            OutlinedTextField(
-                value = state.monthlyAmount,
-                onValueChange = { onEvent(GirisEvent.OnMonthlyAmountChange(it)) },
-                label = { Text("Aylık Miktar") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
-        }
+        OutlinedTextField(
+            value = state.monthlyAmount,
+            onValueChange = { onEvent(GirisEvent.OnMonthlyAmountChange(it)) },
+            label = { Text("Aylık Miktar") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Süre (ay olarak)
-        item {
-            OutlinedTextField(
-                value = state.durationMonths,
-                onValueChange = { onEvent(GirisEvent.OnDurationChange(it)) },
-                label = { Text("Süre (Ay)") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-        }
+        OutlinedTextField(
+            value = state.durationMonths,
+            onValueChange = { onEvent(GirisEvent.OnDurationChange(it)) },
+            label = { Text("Süre (Ay)") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Başlangıç ayı
-        item {
-            Text(
-                text = "Başlangıç Ayı",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Başlangıç Ayı",
+            style = MaterialTheme.typography.titleMedium
+        )
 
-            MonthYearSelector(
-                selectedMonth = state.startMonth,
-                selectedYear = state.startYear,
-                onMonthSelected = { onEvent(GirisEvent.OnStartMonthSelect(it)) },
-                onYearSelected = { onEvent(GirisEvent.OnStartYearSelect(it)) }
-            )
-        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        MonthYearSelector(
+            selectedMonth = state.startMonth,
+            selectedYear = state.startYear,
+            onMonthSelected = { onEvent(GirisEvent.OnStartMonthSelect(it)) },
+            onYearSelected = { onEvent(GirisEvent.OnStartYearSelect(it)) }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Devam butonu
-        item {
-            Button(
-                onClick = { onEvent(GirisEvent.OnContinueClick) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
-                )
-            ) {
-                Text("Devam Et")
-            }
+        Button(
+            onClick = { onEvent(GirisEvent.OnContinueClick) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Primary
+            )
+        ) {
+            Text("Devam Et")
         }
     }
 }
@@ -351,7 +370,9 @@ fun ParticipantCard(
     onRemove: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -371,6 +392,63 @@ fun ParticipantCard(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Sil",
                     tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemTypeDropdown(
+    selectedItemType: ItemType,
+    onItemTypeSelect: (ItemType) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // İtem tipi için görünen isimler
+    val itemTypeNames = mapOf(
+        ItemType.TL to "Türk Lirası (TL)",
+        ItemType.CURRENCY to "Döviz",
+        ItemType.GOLD to "Altın"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(4.dp)
+            )
+            .clip(RoundedCornerShape(4.dp))
+            .clickable { expanded = true }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = itemTypeNames[selectedItemType] ?: "Seçiniz",
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Icon(Icons.Default.ArrowDropDown, contentDescription = "Açılır liste")
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            ItemType.values().forEach { itemType ->
+                DropdownMenuItem(
+                    text = { Text(itemTypeNames[itemType] ?: "") },
+                    onClick = {
+                        onItemTypeSelect(itemType)
+                        expanded = false
+                    }
                 )
             }
         }
@@ -622,13 +700,13 @@ fun ConfirmDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text("Toplanacak Değer: ${
-                    when(state.selectedItemType) {
-                        ItemType.TL -> "Türk Lirası"
-                        ItemType.CURRENCY -> "Döviz (${state.selectedSpecificItem})"
-                        ItemType.GOLD -> "Altın (${state.selectedSpecificItem})"
-                    }
-                }")
+                val valueTypeAndItem = when(state.selectedItemType) {
+                    ItemType.TL -> "Türk Lirası"
+                    ItemType.CURRENCY -> "Döviz (${Constants.CurrencyCodes.getDisplayName(state.selectedSpecificItem)})"
+                    ItemType.GOLD -> "Altın (${Constants.GoldCodes.getDisplayName(state.selectedSpecificItem)})"
+                }
+
+                Text("Toplanacak Değer: $valueTypeAndItem")
 
                 Spacer(modifier = Modifier.height(8.dp))
 
