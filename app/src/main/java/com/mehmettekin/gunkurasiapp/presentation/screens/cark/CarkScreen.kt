@@ -1,5 +1,7 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -43,6 +45,7 @@ import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
 import com.mehmettekin.gunkurasiapp.ui.theme.Primary
 import kotlinx.coroutines.flow.collectLatest
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarkScreen(
@@ -157,7 +160,9 @@ fun CarkContent(
             WheelOfFortune(
                 participants = participants,
                 isSpinning = state.isSpinning,
-                onSpinComplete = {
+                onSpinComplete = { selectedParticipant ->
+                    // Çarkın seçtiği katılımcıyı olayda gönder
+                    onEvent(CarkEvent.OnParticipantSelected(selectedParticipant))
                     onEvent(CarkEvent.OnAnimationComplete)
                 },
                 modifier = Modifier

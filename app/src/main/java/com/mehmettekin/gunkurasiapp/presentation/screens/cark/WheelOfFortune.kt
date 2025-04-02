@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,7 +50,7 @@ import kotlin.math.sin
 fun WheelOfFortune(
     participants: List<Participant>,
     isSpinning: Boolean,
-    onSpinComplete: () -> Unit,
+    onSpinComplete: (Participant) -> Unit, // Değişiklik: Kazanan katılımcıyı döndür
     modifier: Modifier = Modifier
 ) {
     if (participants.isEmpty()) return
@@ -57,6 +58,7 @@ fun WheelOfFortune(
     // Define our rotation animation
     var currentRotation by remember { mutableFloatStateOf(0f) }
     var targetRotation by remember { mutableFloatStateOf(0f) }
+    var selectedParticipant by remember { mutableStateOf<Participant?>(null) }
 
     // Renkler listesi - daha fazla renk çeşitliliği için
     val sectionColors = listOf(
@@ -95,7 +97,20 @@ fun WheelOfFortune(
             if (isSpinning) {
                 currentRotation = finalRotation % 360
                 targetRotation = currentRotation
-                onSpinComplete()
+
+                // Belirle kazananı:
+                // Dönüş açısına göre kazanan katılımcıyı hesaplıyoruz
+                // NOT: Kazanan, göstergenin yukarıda olduğu dilimin katılımcısıdır
+                // İşaretçi yukarıda (0°) olduğu için, çarkın dönüş açısına göre dilimi belirlemeliyiz
+                // Normalize edilmiş açı hesaplama (0-360 arasında)
+                val normalizedAngle = (currentRotation % 360 + 360) % 360
+
+                // Hesaplanan açıya göre kazanan katılımcının indeksini bulalım
+                // Açıyı bölüştürme açısına bölerek indeks elde ediyoruz, ancak çarkın tersine dönüşü için ayarlama gerekir
+                val winnerIndex = (participants.size - (normalizedAngle / sliceAngle).toInt()) % participants.size
+
+                selectedParticipant = participants.getOrNull(winnerIndex)
+                selectedParticipant?.let { onSpinComplete(it) }
             }
         }
     )

@@ -24,6 +24,31 @@ import java.util.Locale
 import javax.inject.Inject
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mehmettekin.gunkurasiapp.R
+import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
+import com.mehmettekin.gunkurasiapp.domain.model.Participant
+import com.mehmettekin.gunkurasiapp.domain.repository.DrawRepository
+import com.mehmettekin.gunkurasiapp.domain.usecase.GenerateDrawResultsUseCase
+import com.mehmettekin.gunkurasiapp.domain.usecase.SaveDrawResultsUseCase
+import com.mehmettekin.gunkurasiapp.util.ResultState
+import com.mehmettekin.gunkurasiapp.util.UiText
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import javax.inject.Inject
+
+
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @HiltViewModel
 class CarkViewModel @Inject constructor(
@@ -48,6 +73,7 @@ class CarkViewModel @Inject constructor(
         when (event) {
             is CarkEvent.OnStartDrawClick -> handleStartDraw()
             is CarkEvent.OnAnimationComplete -> handleAnimationComplete()
+            is CarkEvent.OnParticipantSelected -> handleParticipantSelected(event.participant)
             is CarkEvent.OnDrawComplete -> handleDrawComplete()
             is CarkEvent.OnErrorDismiss -> handleErrorDismiss()
         }
@@ -95,55 +121,59 @@ class CarkViewModel @Inject constructor(
     private fun handleStartDraw() {
         if (_state.value.isSpinning || _state.value.remainingParticipants.isEmpty()) return
 
-        // Get the next draw result
-        if (allDrawResults.isNotEmpty() && _state.value.currentDrawResults.size < allDrawResults.size) {
-            // Eğer son katılımcıya geldiyse, otomatik olarak ata (çark çevirme işlemine gerek olmadan)
-            if (_state.value.remainingParticipants.size == 1 && _state.value.settings != null) {
-                val lastParticipant = _state.value.remainingParticipants.first()
-                val nextResult = allDrawResults[_state.value.currentDrawResults.size]
+        // Eğer son katılımcıya geldiyse, otomatik olarak ata (çark çevirme işlemine gerek olmadan)
+        if (_state.value.remainingParticipants.size == 1 && _state.value.settings != null) {
+            val lastParticipant = _state.value.remainingParticipants.first()
 
-                // Son katılımcıyı doğrudan seç ve sonuçları güncelle
-                _state.update { it.copy(
-                    currentParticipant = lastParticipant
-                ) }
+            // Son katılımcıyı doğrudan seç ve sonuçları güncelle
+            _state.update { it.copy(
+                currentParticipant = lastParticipant
+            ) }
 
-                // Doğrudan animasyonu tamamlandı olarak işaretle
-                handleAnimationComplete()
-                return
-            }
-
-            // Normal durumlarda çekiliş yapılacak
-            val nextResult = allDrawResults[_state.value.currentDrawResults.size]
-
-            // Find the participant for this result
-            val participant = _state.value.remainingParticipants.find { it.id == nextResult.participantId }
-
-            if (participant != null) {
-                // Start spinning animation
-                _state.update { it.copy(
-                    isSpinning = true,
-                    currentParticipant = participant,
-                    rotationAngle = 0f
-                ) }
-            }
+            // Doğrudan animasyonu tamamlandı olarak işaretle
+            handleParticipantSelected(lastParticipant)
+            handleAnimationComplete()
+            return
         }
+
+        // Normal durumlarda çekiliş yapılacak - sadece çarkı döndürmeye başla
+        _state.update { it.copy(
+            isSpinning = true,
+            rotationAngle = 0f
+        ) }
+    }
+
+    // Yeni metot: Seçilen katılımcıyı işle
+    private fun handleParticipantSelected(participant: Participant) {
+        // State'i seçilen katılımcı ile güncelle
+        _state.update { it.copy(
+            currentParticipant = participant
+        ) }
     }
 
     private fun handleAnimationComplete() {
         if (_state.value.currentParticipant == null) return
 
-        // Get the current draw result
+        // Get the current draw result index
         val currentResultIndex = _state.value.currentDrawResults.size
         if (currentResultIndex < allDrawResults.size) {
-            val nextResult = allDrawResults[currentResultIndex]
+            // Mevcut sonuçları güncelle, ancak katılımcı ID'sini çarkın seçtiği katılımcının ID'si ile değiştir
+            val nextResultTemplate = allDrawResults[currentResultIndex]
+            val selectedParticipant = _state.value.currentParticipant!!
+
+            // Yeni bir DrawResult oluştur, ancak katılımcı bilgilerini çarkın seçtiğiyle değiştir
+            val updatedResult = nextResultTemplate.copy(
+                participantId = selectedParticipant.id,
+                participantName = selectedParticipant.name
+            )
 
             // Add to current results
             val updatedResults = _state.value.currentDrawResults.toMutableList()
-            updatedResults.add(nextResult)
+            updatedResults.add(updatedResult)
 
             // Remove participant from remaining list
             val updatedParticipants = _state.value.remainingParticipants.toMutableList()
-            updatedParticipants.removeIf { it.id == _state.value.currentParticipant?.id }
+            updatedParticipants.removeIf { it.id == selectedParticipant.id }
 
             // Update month for next draw if needed
             val nextMonth = if (updatedResults.size < allDrawResults.size) {
@@ -167,7 +197,7 @@ class CarkViewModel @Inject constructor(
 
             // Save results if draw is completed
             if (drawCompleted) {
-                saveResults()
+                saveResults(updatedResults)
             }
         }
     }
@@ -182,11 +212,11 @@ class CarkViewModel @Inject constructor(
         _state.update { it.copy(error = null) }
     }
 
-    private fun saveResults() {
+    private fun saveResults(results: List<DrawResult>) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            when (val result = saveDrawResultsUseCase(allDrawResults)) {
+            when (val result = saveDrawResultsUseCase(results)) {
                 is ResultState.Success -> {
                     _state.update { it.copy(
                         isLoading = false
