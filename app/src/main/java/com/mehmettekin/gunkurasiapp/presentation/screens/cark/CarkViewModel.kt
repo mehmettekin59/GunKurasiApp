@@ -96,6 +96,22 @@ class CarkViewModel @Inject constructor(
 
         // Get the next draw result
         if (allDrawResults.isNotEmpty() && _state.value.currentDrawResults.size < allDrawResults.size) {
+            // Eğer son katılımcıya geldiyse, otomatik olarak ata (çark çevirme işlemine gerek olmadan)
+            if (_state.value.remainingParticipants.size == 1 && _state.value.settings != null) {
+                val lastParticipant = _state.value.remainingParticipants.first()
+                val nextResult = allDrawResults[_state.value.currentDrawResults.size]
+
+                // Son katılımcıyı doğrudan seç ve sonuçları güncelle
+                _state.update { it.copy(
+                    currentParticipant = lastParticipant
+                ) }
+
+                // Doğrudan animasyonu tamamlandı olarak işaretle
+                handleAnimationComplete()
+                return
+            }
+
+            // Normal durumlarda çekiliş yapılacak
             val nextResult = allDrawResults[_state.value.currentDrawResults.size]
 
             // Find the participant for this result

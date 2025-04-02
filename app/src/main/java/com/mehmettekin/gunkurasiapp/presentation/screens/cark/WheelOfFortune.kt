@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -23,11 +22,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -38,11 +39,11 @@ import androidx.compose.ui.unit.sp
 import com.mehmettekin.gunkurasiapp.domain.model.Participant
 import com.mehmettekin.gunkurasiapp.ui.theme.Gold
 import com.mehmettekin.gunkurasiapp.ui.theme.NavyBlue
+import com.mehmettekin.gunkurasiapp.ui.theme.Primary
+import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
-
-
 
 @Composable
 fun WheelOfFortune(
@@ -54,8 +55,20 @@ fun WheelOfFortune(
     if (participants.isEmpty()) return
 
     // Define our rotation animation
-    var currentRotation by remember { mutableStateOf(0f) }
-    var targetRotation by remember { mutableStateOf(0f) }
+    var currentRotation by remember { mutableFloatStateOf(0f) }
+    var targetRotation by remember { mutableFloatStateOf(0f) }
+
+    // Renkler listesi - daha fazla renk çeşitliliği için
+    val sectionColors = listOf(
+        NavyBlue,
+        Gold,
+        Primary,
+        Secondary,
+        Color(0xFF4CAF50), // Yeşil
+        Color(0xFFF44336), // Kırmızı
+        Color(0xFF9C27B0), // Mor
+        Color(0xFF2196F3)  // Mavi
+    )
 
     // Calculate the angle for each participant
     val sliceAngle = 360f / participants.size
@@ -106,7 +119,6 @@ fun WheelOfFortune(
         ) {
             val center = Offset(size.width / 2, size.height / 2)
             val radius = min(size.width, size.height) / 2
-            val sectionColors = listOf(NavyBlue, Gold)
 
             // Draw wheel sections
             for (i in participants.indices) {
@@ -132,12 +144,12 @@ fun WheelOfFortune(
                     cap = StrokeCap.Round
                 )
 
-                // Draw participant names
+                // Draw participant names - improved positioning
                 drawParticipantName(
                     textMeasurer = textMeasurer,
                     participant = participants[i],
                     angle = startAngle + (sliceAngle / 2),
-                    radius = radius * 0.75f,
+                    radius = radius * 0.7f,
                     center = center
                 )
             }
@@ -154,36 +166,28 @@ fun WheelOfFortune(
             )
         }
 
-        // Draw pointer
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val center = Offset(size.width / 2, size.height / 2)
-                val radius = min(size.width, size.height) / 2
+        // Draw pointer - triangle shape at top (pointing downward)
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val centerX = size.width / 2
+            val pointerSize = size.width * 0.08f  // Pointer size proportional to wheel
 
-                // Draw triangle pointer
-                val pointerSize = radius * 0.15f
-                val pointerPath = androidx.compose.ui.graphics.Path().apply {
-                    moveTo(center.x, center.y - radius)
-                    lineTo(center.x - pointerSize, center.y - radius - pointerSize)
-                    lineTo(center.x + pointerSize, center.y - radius - pointerSize)
-                    close()
-                }
-
-                drawPath(
-                    path = pointerPath,
-                    color = Color.Red,
-                    style = androidx.compose.ui.graphics.drawscope.Fill
-                )
+            // Create a triangle path pointing downward
+            val trianglePath = Path().apply {
+                moveTo(centerX, pointerSize * 2)  // Bottom point
+                lineTo(centerX - pointerSize, 0f)  // Top left
+                lineTo(centerX + pointerSize, 0f)  // Top right
+                close()
             }
+
+            // Draw the triangle
+            drawPath(
+                path = trianglePath,
+                color = Color.Red,
+                style = Fill
+            )
         }
     }
 }
-
-
 
 private fun DrawScope.drawParticipantName(
     textMeasurer: androidx.compose.ui.text.TextMeasurer,
@@ -192,51 +196,40 @@ private fun DrawScope.drawParticipantName(
     radius: Float,
     center: Offset
 ) {
-    // Calculate the position for the text
-    val radians = Math.toRadians(angle.toDouble())
-    val x = center.x + (radius * cos(radians)).toFloat()
-    val y = center.y + (radius * sin(radians)).toFloat()
-
     // Make the text size appropriate for the wheel
-    val fontSize = (radius * 0.1f).coerceAtLeast(12.sp.toPx()).coerceAtMost(16.sp.toPx())
+    val fontSize = (radius * 0.12f).coerceAtLeast(12.sp.toPx()).coerceAtMost(18.sp.toPx())
 
-    // Measure text
+    // Measure text - enforcing white color
     val textLayoutResult = textMeasurer.measure(
         text = participant.name,
         style = TextStyle(
             fontSize = fontSize.toSp(),
             color = Color.White,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
         )
     )
 
-    // Position text
+    // Calculate position parameters
     val textWidth = textLayoutResult.size.width
     val textHeight = textLayoutResult.size.height
-    val textPosition = Offset(
-        x - textWidth / 2,
-        y - textHeight / 2
-    )
 
-    withTransform({
-        // İlk rotate işlemi
-        rotate(angle + 90f)
-        // Sonra translate işlemi
-        translate(
-            textPosition.x + textWidth / 2 - (center.x),
-            textPosition.y + textHeight / 2 - (center.y)
-        )
-    }) {
-        // Draw text
-        drawText(
-            textLayoutResult = textLayoutResult,
-            topLeft = Offset(x = -textWidth.toFloat() / 2, y = -textHeight.toFloat() / 2)
-        )
+    // Simpler approach: translate to center, rotate, then draw text at correct offset
+    translate(center.x, center.y) {
+        rotate(angle + 90) {
+            // Calculate offset from center for text placement
+            val xOffset = radius * 0.7f - textWidth / 2
+            val yOffset = -textHeight / 2
+
+            // Draw text with white color
+            drawText(
+                textLayoutResult = textLayoutResult,
+                topLeft = Offset(xOffset.toFloat(), yOffset.toFloat()),
+                color = Color.White
+            )
+        }
     }
 }
-
-
-
 
 private fun calculatePointOnCircle(center: Offset, radius: Float, angleInDegrees: Double): Offset {
     val angleInRadians = Math.toRadians(angleInDegrees)

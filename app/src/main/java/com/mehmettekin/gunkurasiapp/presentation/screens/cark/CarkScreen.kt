@@ -1,6 +1,5 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -66,7 +65,6 @@ fun CarkScreen(
     // Error handling
     LaunchedEffect(key1 = state.error) {
         state.error?.let { error ->
-
             snackbarHostState.showSnackbar(error.asString(context))
             viewModel.onEvent(CarkEvent.OnErrorDismiss)
         }

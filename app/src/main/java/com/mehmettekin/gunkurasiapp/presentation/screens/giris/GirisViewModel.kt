@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.time.YearMonth
 import javax.inject.Inject
 
-@@HiltViewModel
+@HiltViewModel
 class GirisViewModel @Inject constructor(
     private val drawRepository: DrawRepository,
     private val kapalicarsiRepository: KapalicarsiRepository,
