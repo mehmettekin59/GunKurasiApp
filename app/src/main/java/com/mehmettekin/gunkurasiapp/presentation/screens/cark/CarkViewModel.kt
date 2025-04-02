@@ -2,12 +2,12 @@ package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mehmettekin.gunkurasiapp.R
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
-import com.mehmettekin.gunkurasiapp.domain.model.Participant
 import com.mehmettekin.gunkurasiapp.domain.repository.DrawRepository
 import com.mehmettekin.gunkurasiapp.domain.usecase.GenerateDrawResultsUseCase
 import com.mehmettekin.gunkurasiapp.domain.usecase.SaveDrawResultsUseCase
@@ -41,6 +41,7 @@ class CarkViewModel @Inject constructor(
     val navigationEvent = _navigationEvent.asSharedFlow()
 
     private var allDrawResults: List<DrawResult> = emptyList()
+    private var finalResults: MutableList<DrawResult> = mutableListOf()
 
     init {
         loadDrawSettings()
@@ -49,8 +50,8 @@ class CarkViewModel @Inject constructor(
     fun onEvent(event: CarkEvent) {
         when (event) {
             is CarkEvent.OnStartDrawClick -> handleStartDraw()
+            is CarkEvent.OnWheelRotationComplete -> handleWheelRotationComplete(event.finalAngle)
             is CarkEvent.OnAnimationComplete -> handleAnimationComplete()
-            is CarkEvent.OnParticipantSelected -> handleParticipantSelected(event.participant)
             is CarkEvent.OnDrawComplete -> handleDrawComplete()
             is CarkEvent.OnErrorDismiss -> handleErrorDismiss()
         }
@@ -73,8 +74,9 @@ class CarkViewModel @Inject constructor(
                         return@launch
                     }
 
-                    // Generate draw results
+                    // Generate draw results template (sadece aylar ve para miktarları)
                     allDrawResults = generateDrawResultsUseCase(settings)
+                    finalResults = mutableListOf()
 
                     // Initialize state with remaining participants
                     _state.update { it.copy(
@@ -102,13 +104,12 @@ class CarkViewModel @Inject constructor(
         if (_state.value.remainingParticipants.size == 1 && _state.value.settings != null) {
             val lastParticipant = _state.value.remainingParticipants.first()
 
-            // Son katılımcıyı doğrudan seç ve sonuçları güncelle
+            // Son katılımcıyı doğrudan seç
             _state.update { it.copy(
                 currentParticipant = lastParticipant
             ) }
 
             // Doğrudan animasyonu tamamlandı olarak işaretle
-            handleParticipantSelected(lastParticipant)
             handleAnimationComplete()
             return
         }
@@ -120,37 +121,75 @@ class CarkViewModel @Inject constructor(
         ) }
     }
 
-    // Yeni metot: Seçilen katılımcıyı işle
-    private fun handleParticipantSelected(participant: Participant) {
-        // State'i seçilen katılımcı ile güncelle
+    private fun handleWheelRotationComplete(finalAngle: Float) {
+        val participants = _state.value.remainingParticipants
+        if (participants.isEmpty()) return
+
+        // Açıyı 0-360 arasına normalize et
+        val normalizedAngle = (finalAngle % 360 + 360) % 360
+
+        // Dilim açısını hesapla
+        val sliceAngle = 360f / participants.size
+
+        // DEBUG: Açı ve dilim bilgilerini logla
+        Log.d("CarkViewModel", "Normalize Açı: $normalizedAngle°, Dilim Açısı: $sliceAngle°, Katılımcı Sayısı: ${participants.size}")
+
+        // DOĞRU KAZANAN HESAPLAMA:
+        // 1. Önce şu anki açının hangi dilimde olduğunu belirle (0 derece yukarıda başlar)
+        val sliceNumber = (normalizedAngle / sliceAngle).toInt()
+
+        // 2. İşaretçi yukarıda (0°) olduğu için, açı arttıkça saat yönünde hareket eder
+        //    Ancak dilim numaraları TERS sırada artıyor (çarkı yukarıdan çizerken)
+        //    Bu yüzden toplam dilim sayısından çıkarıp mod almalıyız
+        val winnerIndex = (participants.size - sliceNumber) % participants.size
+
+        // Güvenlik kontrolü (indeks sınırlar içinde olmalı)
+        val safeIndex = winnerIndex.coerceIn(0, participants.size - 1)
+
+        // DEBUG: Kazananı logla
+        Log.d("CarkViewModel", "Dilim Numarası: $sliceNumber, Kazanan İndeks: $winnerIndex")
+        for (i in participants.indices) {
+            val startAngle = i * sliceAngle
+            val endAngle = (i + 1) * sliceAngle
+            Log.d("CarkViewModel", "Dilim $i (${participants[i].name}): $startAngle° - $endAngle°")
+        }
+
+        // Kazanan katılımcıyı belirle
+        val winningParticipant = participants[safeIndex]
+
+        // Kazanan katılımcıyı ve son dönüş açısını state'e kaydet
         _state.update { it.copy(
-            currentParticipant = participant
+            currentParticipant = winningParticipant,
+            finalRotationAngle = normalizedAngle
         ) }
     }
 
     private fun handleAnimationComplete() {
-        if (_state.value.currentParticipant == null) return
+        val currentParticipant = _state.value.currentParticipant ?: return
 
         // Get the current draw result index
         val currentResultIndex = _state.value.currentDrawResults.size
         if (currentResultIndex < allDrawResults.size) {
-            // Mevcut sonuçları güncelle, ancak katılımcı ID'sini çarkın seçtiği katılımcının ID'si ile değiştir
+            // Şablondan mevcut ay için bir sonuç al
             val nextResultTemplate = allDrawResults[currentResultIndex]
-            val selectedParticipant = _state.value.currentParticipant!!
 
-            // Yeni bir DrawResult oluştur, ancak katılımcı bilgilerini çarkın seçtiğiyle değiştir
-            val updatedResult = nextResultTemplate.copy(
-                participantId = selectedParticipant.id,
-                participantName = selectedParticipant.name
+            // Yeni bir DrawResult oluştur, seçilen katılımcı bilgileriyle güncelle
+            val updatedResult = DrawResult(
+                participantId = currentParticipant.id,
+                participantName = currentParticipant.name,
+                month = nextResultTemplate.month,
+                amount = nextResultTemplate.amount,
+                date = System.currentTimeMillis()
             )
 
             // Add to current results
             val updatedResults = _state.value.currentDrawResults.toMutableList()
             updatedResults.add(updatedResult)
+            finalResults.add(updatedResult)
 
             // Remove participant from remaining list
             val updatedParticipants = _state.value.remainingParticipants.toMutableList()
-            updatedParticipants.removeIf { it.id == selectedParticipant.id }
+            updatedParticipants.removeIf { it.id == currentParticipant.id }
 
             // Update month for next draw if needed
             val nextMonth = if (updatedResults.size < allDrawResults.size) {
@@ -174,7 +213,7 @@ class CarkViewModel @Inject constructor(
 
             // Save results if draw is completed
             if (drawCompleted) {
-                saveResults(updatedResults)
+                saveResults()
             }
         }
     }
@@ -189,11 +228,12 @@ class CarkViewModel @Inject constructor(
         _state.update { it.copy(error = null) }
     }
 
-    private fun saveResults(results: List<DrawResult>) {
+    private fun saveResults() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            when (val result = saveDrawResultsUseCase(results)) {
+            // Çarkın seçtiği katılımcılarla oluşturulan nihai sonuçları kaydet
+            when (val result = saveDrawResultsUseCase(finalResults)) {
                 is ResultState.Success -> {
                     _state.update { it.copy(
                         isLoading = false

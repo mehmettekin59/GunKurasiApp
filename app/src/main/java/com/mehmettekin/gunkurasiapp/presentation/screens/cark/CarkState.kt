@@ -15,7 +15,7 @@ data class CarkState(
     val currentMonth: String = "",
     val isSpinning: Boolean = false,
     val rotationAngle: Float = 0f,
+    val finalRotationAngle: Float = 0f, // Yeni eklenen alan - son dönüş açısı
     val drawCompleted: Boolean = false,
     val animationCompleted: Boolean = false
 )
-
