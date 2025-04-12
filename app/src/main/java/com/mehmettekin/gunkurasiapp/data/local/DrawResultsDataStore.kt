@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
-import com.mehmettekin.gunkurasiapp.domain.model.DrawSettings
+import com.mehmettekin.gunkurasiapp.domain.model.ParticipantsScreenWholeInformation
 import com.mehmettekin.gunkurasiapp.domain.model.Participant
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -44,7 +44,7 @@ class DrawResultsDataStore @Inject constructor(
 
     private val drawResultsAdapter: JsonAdapter<List<DrawResult>> = moshi.adapter(drawResultsType)
     private val participantsAdapter: JsonAdapter<List<Participant>> = moshi.adapter(participantsType)
-    private val drawSettingsAdapter: JsonAdapter<DrawSettings> = moshi.adapter(DrawSettings::class.java)
+    private val drawSettingsAdapter: JsonAdapter<ParticipantsScreenWholeInformation> = moshi.adapter(ParticipantsScreenWholeInformation::class.java)
 
     // Draw Results operations
     suspend fun saveDrawResults(results: List<DrawResult>) {
@@ -82,13 +82,13 @@ class DrawResultsDataStore @Inject constructor(
     }
 
     // Draw Settings operations
-    suspend fun saveDrawSettings(settings: DrawSettings) {
+    suspend fun saveDrawSettings(settings: ParticipantsScreenWholeInformation) {
         context.drawResultsDataStore.edit { preferences ->
             preferences[drawSettingsKey] = drawSettingsAdapter.toJson(settings)
         }
     }
 
-    suspend fun getDrawSettings(): DrawSettings? {
+    suspend fun getDrawSettings(): ParticipantsScreenWholeInformation? {
         return context.drawResultsDataStore.data.map { preferences ->
             val json = preferences[drawSettingsKey] ?: return@map null
             drawSettingsAdapter.fromJson(json)

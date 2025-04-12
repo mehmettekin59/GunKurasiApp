@@ -40,8 +40,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mehmettekin.gunkurasiapp.presentation.common.LoadingIndicator
 import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
-import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
-import com.mehmettekin.gunkurasiapp.ui.theme.Primary
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,9 +80,9 @@ fun CarkScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Çekiliş", color = OnPrimary) },
+                title = { Text("Çekiliş", color = MaterialTheme.colorScheme.onPrimary) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -127,7 +125,7 @@ fun CarkContent(
                 .padding(bottom = 16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Primary
+                containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
             Column(
@@ -139,7 +137,7 @@ fun CarkContent(
                 Text(
                     text = "Çekilişi Yapılan Ay",
                     style = MaterialTheme.typography.titleMedium,
-                    color = OnPrimary
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -148,7 +146,7 @@ fun CarkContent(
                     text = state.currentMonth,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = OnPrimary
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -232,7 +230,7 @@ fun CarkContent(
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 enabled = !state.isSpinning
             ) {

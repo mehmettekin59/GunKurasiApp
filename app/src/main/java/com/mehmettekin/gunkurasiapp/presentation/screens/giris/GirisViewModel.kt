@@ -2,7 +2,7 @@ package com.mehmettekin.gunkurasiapp.presentation.screens.giris
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mehmettekin.gunkurasiapp.domain.model.DrawSettings
+import com.mehmettekin.gunkurasiapp.domain.model.ParticipantsScreenWholeInformation
 import com.mehmettekin.gunkurasiapp.domain.model.ItemType
 import com.mehmettekin.gunkurasiapp.domain.model.Participant
 import com.mehmettekin.gunkurasiapp.domain.repository.DrawRepository
@@ -71,9 +71,6 @@ class GirisViewModel @Inject constructor(
     private fun handleParticipantCountChange(count: String) {
         if (count.isEmpty() || count.toIntOrNull() != null) {
             _state.update { it.copy(participantCount = count) }
-
-            // No longer automatically create empty participants based on count
-            // The user should explicitly add participants
         }
     }
 
@@ -160,7 +157,7 @@ class GirisViewModel @Inject constructor(
             val monthlyAmount = _state.value.monthlyAmount.toDoubleOrNull() ?: 0.0
             val durationMonths = _state.value.durationMonths.toIntOrNull() ?: 0
 
-            val settings = DrawSettings(
+            val settings = ParticipantsScreenWholeInformation(
                 participantCount = participantCount,
                 participants = _state.value.participants,
                 itemType = _state.value.selectedItemType,
@@ -198,7 +195,7 @@ class GirisViewModel @Inject constructor(
             val monthlyAmount = _state.value.monthlyAmount.toDoubleOrNull() ?: 0.0
             val durationMonths = _state.value.durationMonths.toIntOrNull() ?: 0
 
-            val settings = DrawSettings(
+            val settings = ParticipantsScreenWholeInformation(
                 participantCount = participantCount,
                 participants = _state.value.participants,
                 itemType = _state.value.selectedItemType,

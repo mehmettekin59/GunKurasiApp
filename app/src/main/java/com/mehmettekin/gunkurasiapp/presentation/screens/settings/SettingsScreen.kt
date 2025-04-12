@@ -44,9 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mehmettekin.gunkurasiapp.presentation.common.LoadingIndicator
-import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
-import com.mehmettekin.gunkurasiapp.ui.theme.Primary
-import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
+import com.mehmettekin.gunkurasiapp.ui.theme.onPrimary
+import com.mehmettekin.gunkurasiapp.ui.theme.onSecondary
+import com.mehmettekin.gunkurasiapp.ui.theme.secondary
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,9 +70,9 @@ fun SettingsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Ayarlar", color = OnPrimary) },
+                title = { Text("Ayarlar", color = onPrimary) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Primary
+                    containerColor = onSecondary
                 )
             )
         }
@@ -249,7 +250,7 @@ fun ApiUpdateIntervalSetting(
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,
-                                    tint = Secondary
+                                    tint = secondary
                                 )
                             }
                         }
@@ -319,7 +320,7 @@ fun LanguageSetting(
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,
-                                    tint = Secondary
+                                    tint = secondary
                                 )
                             }
                         }

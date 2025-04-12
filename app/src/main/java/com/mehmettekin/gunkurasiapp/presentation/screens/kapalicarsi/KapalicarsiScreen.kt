@@ -35,20 +35,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mehmettekin.gunkurasiapp.domain.model.Currency
 import com.mehmettekin.gunkurasiapp.domain.model.Gold
-import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
-import com.mehmettekin.gunkurasiapp.ui.theme.Primary
-import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
 import com.mehmettekin.gunkurasiapp.util.Constants
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -60,6 +61,9 @@ import java.util.Locale
 fun KapalicarsiScreen(
     viewModel: KapalicarsiViewModel = hiltViewModel()
 ) {
+
+
+
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -76,16 +80,16 @@ fun KapalicarsiScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Kapalıçarşı", color = OnPrimary) },
+                title = { Text("Kapalıçarşı", color = MaterialTheme.colorScheme.onPrimary) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
                     IconButton(onClick = { viewModel.onEvent(KapalicarsiEvent.OnRefresh) }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Yenile",
-                            tint = OnPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -121,7 +125,7 @@ fun KapalicarsiScreen(
                         .height(150.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Secondary)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary,)
                 }
             } else if (state.currencies.isEmpty()) {
                 Box(
@@ -160,7 +164,7 @@ fun KapalicarsiScreen(
                         .height(150.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Secondary)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
                 }
             } else if (state.gold.isEmpty()) {
                 Box(

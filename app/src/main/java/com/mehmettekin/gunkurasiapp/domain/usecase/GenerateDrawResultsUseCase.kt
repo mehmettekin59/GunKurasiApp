@@ -4,7 +4,7 @@ package com.mehmettekin.gunkurasiapp.domain.usecase
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
-import com.mehmettekin.gunkurasiapp.domain.model.DrawSettings
+import com.mehmettekin.gunkurasiapp.domain.model.ParticipantsScreenWholeInformation
 import com.mehmettekin.gunkurasiapp.domain.model.ItemType
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -14,7 +14,7 @@ import kotlin.random.Random
 
 class GenerateDrawResultsUseCase @Inject constructor() {
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
-    operator fun invoke(settings: DrawSettings): List<DrawResult> {
+    operator fun invoke(settings: ParticipantsScreenWholeInformation): List<DrawResult> {
         val participants = settings.participants.toMutableList()
         val results = mutableListOf<DrawResult>()
 

@@ -14,8 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
-import com.mehmettekin.gunkurasiapp.ui.theme.Primary
+
 import com.mehmettekin.gunkurasiapp.util.UiText
 
 @Composable
@@ -45,10 +44,7 @@ fun ErrorView(
 
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Primary,
-                contentColor = OnPrimary
-            )
+            colors = ButtonDefaults.buttonColors()
         ) {
             Text(text = "Tekrar Dene")
         }

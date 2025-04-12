@@ -2,7 +2,7 @@ package com.mehmettekin.gunkurasiapp.data.repository
 
 import com.mehmettekin.gunkurasiapp.data.local.DrawResultsDataStore
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
-import com.mehmettekin.gunkurasiapp.domain.model.DrawSettings
+import com.mehmettekin.gunkurasiapp.domain.model.ParticipantsScreenWholeInformation
 import com.mehmettekin.gunkurasiapp.domain.model.Participant
 import com.mehmettekin.gunkurasiapp.domain.repository.DrawRepository
 import com.mehmettekin.gunkurasiapp.util.ResultState
@@ -36,7 +36,7 @@ class DrawRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveDrawSettings(settings: DrawSettings): ResultState<Unit> {
+    override suspend fun saveDrawSettings(settings: ParticipantsScreenWholeInformation): ResultState<Unit> {
         return try {
             dataStore.saveDrawSettings(settings)
             ResultState.Success(Unit)
@@ -45,7 +45,7 @@ class DrawRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDrawSettings(): ResultState<DrawSettings?> {
+    override suspend fun getDrawSettings(): ResultState<ParticipantsScreenWholeInformation?> {
         return try {
             val settings = dataStore.getDrawSettings()
             ResultState.Success(settings)

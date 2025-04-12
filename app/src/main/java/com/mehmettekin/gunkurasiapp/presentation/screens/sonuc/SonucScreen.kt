@@ -49,9 +49,9 @@ import com.mehmettekin.gunkurasiapp.R
 import com.mehmettekin.gunkurasiapp.domain.model.DrawResult
 import com.mehmettekin.gunkurasiapp.presentation.common.LoadingIndicator
 import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
-import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
-import com.mehmettekin.gunkurasiapp.ui.theme.Primary
-import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
+import com.mehmettekin.gunkurasiapp.ui.theme.onPrimary
+import com.mehmettekin.gunkurasiapp.ui.theme.primary
+import com.mehmettekin.gunkurasiapp.ui.theme.secondary
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,9 +95,9 @@ fun SonucScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Sonuçlar", color = OnPrimary) },
+                title = { Text("Sonuçlar", color = onPrimary) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Primary
+                    containerColor = primary
                 )
             )
         }
@@ -190,7 +190,7 @@ fun SonucContent(
                     onClick = onGeneratePdf,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary
+                        containerColor = primary
                     )
                 ) {
                     Icon(
@@ -206,7 +206,7 @@ fun SonucContent(
                     modifier = Modifier.weight(1f),
                     enabled = state.isPdfGenerated,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (state.isPdfGenerated) Secondary else MaterialTheme.colorScheme.surfaceVariant
+                        containerColor = if (state.isPdfGenerated) secondary else MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
                     Icon(
@@ -230,7 +230,7 @@ fun SonucContent(
                 onClick = onNavigateToKapalicarsi,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
+                    containerColor = primary
                 )
             ) {
                 Text("Kapalıçarşı")
@@ -240,7 +240,7 @@ fun SonucContent(
                 onClick = onNavigateToSettings,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
+                    containerColor = primary
                 )
             ) {
                 Text("Ayarlar")

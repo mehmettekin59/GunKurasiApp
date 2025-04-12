@@ -17,48 +17,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    onPrimary = OnPrimary,
-    primaryContainer = PrimaryVariant,
-    onPrimaryContainer = OnPrimary,
-    secondary = Secondary,
-    onSecondary = OnSecondary,
-    secondaryContainer = SecondaryVariant,
-    onSecondaryContainer = OnSecondary,
-    tertiary = Secondary,
-    onTertiary = OnSecondary,
-    background = Color(0xFF121212),
-    onBackground = White,
-    surface = Color(0xFF1E1E1E),
-    onSurface = White,
-    error = Error,
-    onError = OnError
-)
 
-private val LightColorScheme = lightColorScheme(
-    primary = Primary,
-    onPrimary = OnPrimary,
-    primaryContainer = PrimaryVariant,
-    onPrimaryContainer = OnPrimary,
-    secondary = Secondary,
-    onSecondary = OnSecondary,
-    secondaryContainer = SecondaryVariant,
-    onSecondaryContainer = OnSecondary,
-    tertiary = Secondary,
-    onTertiary = OnSecondary,
-    background = Background,
-    onBackground = OnBackground,
-    surface = Surface,
-    onSurface = OnSurface,
-    error = Error,
-    onError = OnError
-)
+
+
+
 
 @Composable
 fun GunKurasiAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -67,9 +33,8 @@ fun GunKurasiAppTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> darkColorScheme()
+        else -> lightColorScheme()
     }
 
     val view = LocalView.current
@@ -77,7 +42,7 @@ fun GunKurasiAppTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
@@ -87,3 +52,4 @@ fun GunKurasiAppTheme(
         content = content
     )
 }
+

@@ -12,7 +12,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mehmettekin.gunkurasiapp.presentation.common.RotatingLogo
 import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
-import com.mehmettekin.gunkurasiapp.ui.theme.Background
+import com.mehmettekin.gunkurasiapp.ui.theme.background
+
 
 @Composable
 fun SplashScreen(
@@ -33,7 +34,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(background)
     ) {
         RotatingLogo(
             onAnimationFinish = {

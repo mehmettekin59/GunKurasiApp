@@ -1,23 +1,10 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.giris
 
 import androidx.compose.foundation.BorderStroke
-import kotlinx.coroutines.flow.collectLatest
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -25,76 +12,77 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mehmettekin.gunkurasiapp.domain.model.ItemType
 import com.mehmettekin.gunkurasiapp.domain.model.Participant
 import com.mehmettekin.gunkurasiapp.presentation.navigation.Screen
-import com.mehmettekin.gunkurasiapp.ui.theme.OnPrimary
-import com.mehmettekin.gunkurasiapp.ui.theme.Primary
-import com.mehmettekin.gunkurasiapp.ui.theme.Secondary
+import com.mehmettekin.gunkurasiapp.ui.theme.Gold
+import com.mehmettekin.gunkurasiapp.ui.theme.NavyBlue
 import com.mehmettekin.gunkurasiapp.ui.theme.White
 import com.mehmettekin.gunkurasiapp.util.Constants
-
+import kotlinx.coroutines.flow.collectLatest
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GirisScreen(
     navController: NavController,
+    //viewModel: KapaliCarsiViewModel = hiltViewModel()
     viewModel: GirisViewModel = hiltViewModel()
 ) {
+    /*
+
+    val exchangeRatesState by viewModel.exchangeRates.collectAsStateWithLifecycle()
+
+    // Gösterilecek veri türü için state (Altın / Döviz)
+    var selectedItemType by remember { mutableStateOf(ItemType.GOLD) }
+
+    val goldCodeToName = Constraints.goldCodeToName
+    val currencyCodeToName = Constraints.currencyCodeToName
+    val goldCodeList = Constraints.goldCodeList
+    val currencyCodeList = Constraints.currencyCodeList
+    // RateCard içinde isim bulmak için birleşik harita (sadece gerektiğinde hesaplanabilir)
+    val codeToNameMap = remember { goldCodeToName + currencyCodeToName }
+
+    // ViewModel'den gelen veriyi filtreleyerek altın ve döviz listelerini oluştur
+    // `remember` ile state değişimine bağlı olarak yeniden hesapla
+    val (goldRates, currencyRates) = remember(exchangeRatesState) {
+        when (val state = exchangeRatesState) { // Smart cast için local variable
+            is ResultState.Success -> {
+                val data = state.data
+                val gold = data.filter { it.code in goldCodeList.toSet() }
+                val currency = data.filter { it.code in currencyCodeList.toSet() }
+                Pair(gold, currency)
+            }
+            else -> Pair(emptyList(), emptyList()) // Loading, Error veya Idle durumları için boş listeler
+        }
+    }
+     */
+
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    // Navigation event handling
+    // Navigation and error handling
     LaunchedEffect(key1 = true) {
         viewModel.navigationEvent.collectLatest {
             navController.navigate(Screen.Cark.route)
         }
     }
 
-    // Error handling
     LaunchedEffect(key1 = state.error) {
         state.error?.let { error ->
             snackbarHostState.showSnackbar(error.asString(context))
@@ -106,9 +94,16 @@ fun GirisScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Gün Kurası", color = OnPrimary) },
+                title = {
+                    Text(
+                        " Gün Kurası",
+                        color = White,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Primary
+                    containerColor = NavyBlue
                 )
             )
         }
@@ -123,23 +118,16 @@ fun GirisScreen(
 
         // Show confirmation dialog
         if (state.isShowingConfirmDialog) {
-            ConfirmDialog(
+            ConfirmationDialog(
                 state = state,
                 onConfirm = { viewModel.onEvent(GirisEvent.OnConfirmDialogConfirm) },
                 onDismiss = { viewModel.onEvent(GirisEvent.OnConfirmDialogDismiss) }
             )
         }
 
-        // Show loading
+        // Show loading indicator
         if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Secondary)
-            }
+            LoadingOverlay()
         }
     }
 }
@@ -155,304 +143,168 @@ fun GirisContent(
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // Katılımcı sayısı
-
-        OutlinedTextField(
-            value = state.participantCount,
-            onValueChange = { onEvent(GirisEvent.OnParticipantCountChange(it)) },
-            label = { Text("Katılımcı Sayısını Giriniz") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Katılımcı listesi
-        // Katılımcı ekleme komponenti
-        AddParticipantCard(onAddParticipant = { name ->
-            onEvent(GirisEvent.OnAddParticipant(name))
-        })
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Katılımcı kartları - sabit yükseklikte ve kaydırılabilir alan
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-        ) {
-            if (state.participants.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Henüz katılımcı eklenmedi")
-                }
-            } else {
-                LazyColumn {
-                    items(state.participants) { participant ->
-                        ParticipantCard(
-                            participant = participant,
-                            onRemove = { onEvent(GirisEvent.OnRemoveParticipant(participant)) }
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Toplanacak şeyin cinsi - Dropdown olarak değiştirildi
-        Text(
-            text = "Seçiniz:",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        ItemTypeDropdown(
+        // Item type selection (TL, Currency, Gold)
+        ItemTypeSelector(
             selectedItemType = state.selectedItemType,
             onItemTypeSelect = { onEvent(GirisEvent.OnItemTypeSelect(it)) }
         )
 
-        // Döviz veya Altın seçiminde spesifik tür seçimi
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Specific currency or gold type selection when applicable
         if (state.selectedItemType == ItemType.CURRENCY || state.selectedItemType == ItemType.GOLD) {
-            Column {
-                Text(
-                    text = if (state.selectedItemType == ItemType.CURRENCY) "Döviz Türü" else "Altın Türü",
-                    style = MaterialTheme.typography.titleMedium
-                )
+            SpecificItemSelector(
+                selectedItemType = state.selectedItemType,
+                selectedSpecificItem = state.selectedSpecificItem,
+                currencyOptions = state.currencyOptions,
+                goldOptions = state.goldOptions,
+                onSpecificItemSelect = { onEvent(GirisEvent.OnSpecificItemSelect(it)) }
+            )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                when (state.selectedItemType) {
-                    ItemType.CURRENCY -> {
-                        val options = state.currencyOptions.map { Constants.CurrencyCodes.getDisplayName(it) }
-                        val selectedValue = if (state.selectedSpecificItem.isNotEmpty())
-                            Constants.CurrencyCodes.getDisplayName(state.selectedSpecificItem) else ""
-
-                        DropdownSelector(
-                            selectedValue = selectedValue,
-                            options = options,
-                            onValueSelected = { displayName ->
-                                val code = Constants.CurrencyCodes.getCodeFromDisplayName(displayName)
-                                onEvent(GirisEvent.OnSpecificItemSelect(code))
-                            },
-                            placeholder = "Döviz seçiniz"
-                        )
-                    }
-                    ItemType.GOLD -> {
-                        val options = state.goldOptions.map { Constants.GoldCodes.getDisplayName(it) }
-                        val selectedValue = if (state.selectedSpecificItem.isNotEmpty())
-                            Constants.GoldCodes.getDisplayName(state.selectedSpecificItem) else ""
-
-                        DropdownSelector(
-                            selectedValue = selectedValue,
-                            options = options,
-                            onValueSelected = { displayName ->
-                                val code = Constants.GoldCodes.getCodeFromDisplayName(displayName)
-                                onEvent(GirisEvent.OnSpecificItemSelect(code))
-                            },
-                            placeholder = "Altın çeşidi seçiniz"
-                        )
-                    }
-                    else -> {}
-                }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Aylık miktar
-        OutlinedTextField(
+        // Monthly amount
+        ModernTextField(
             value = state.monthlyAmount,
             onValueChange = { onEvent(GirisEvent.OnMonthlyAmountChange(it)) },
-            label = { Text("Aylık Miktar") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            label = "Aylık Miktar",
+            keyboardType = KeyboardType.Decimal,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.AttachMoney,
+                    contentDescription = null,
+                    tint = Gold
+                )
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Süre (ay olarak)
-        OutlinedTextField(
+        // Duration in months
+        ModernTextField(
             value = state.durationMonths,
             onValueChange = { onEvent(GirisEvent.OnDurationChange(it)) },
-            label = { Text("Süre (Ay)") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            label = "Süre (Ay)",
+            keyboardType = KeyboardType.Number,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = null,
+                    tint = Gold
+                )
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Başlangıç ayı
+        // Starting month and year
         Text(
-            text = "Başlangıç Ayı",
-            style = MaterialTheme.typography.titleMedium
+            text = "Başlangıç Tarihi",
+            style = MaterialTheme.typography.titleMedium,
+            color = NavyBlue,
+            fontWeight = FontWeight.Medium
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        MonthYearSelector(
+        ModernDateSelector(
             selectedMonth = state.startMonth,
             selectedYear = state.startYear,
             onMonthSelected = { onEvent(GirisEvent.OnStartMonthSelect(it)) },
             onYearSelected = { onEvent(GirisEvent.OnStartYearSelect(it)) }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Devam butonu
+        // Participants section
+        ParticipantsSection(
+            participants = state.participants,
+            onAddParticipant = { onEvent(GirisEvent.OnAddParticipant(it)) },
+            onRemoveParticipant = { onEvent(GirisEvent.OnRemoveParticipant(it)) }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Continue button
         Button(
             onClick = { onEvent(GirisEvent.OnContinueClick) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Primary
+                containerColor = NavyBlue
             )
         ) {
-            Text("Devam Et")
-        }
-    }
-}
-
-@Composable
-fun AddParticipantCard(
-    onAddParticipant: (String) -> Unit
-) {
-    var name by remember { mutableStateOf("") }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-
-
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Katılımcı Adı Soyadı") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = null,
+                tint = White
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedButton(
-                onClick = {
-                    if (name.isNotBlank()) {
-                        onAddParticipant(name)
-                        name = ""
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(6.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
-                )
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Katılımcı Ekle", tint = White)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Katılımcı Ekle")
-            }
-        }
-    }
-}
-
-@Composable
-fun ParticipantCard(
-    participant: Participant,
-    onRemove: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(color = MaterialTheme.colorScheme.outline, width = 0.5.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                modifier = Modifier.padding(start = 4.dp, end = 4.dp),
-                text = participant.name,
-                style = MaterialTheme.typography.bodyLarge
+                "Devam Et",
+                fontWeight = FontWeight.Bold,
+                color = White
             )
-
-            IconButton(onClick = onRemove) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Sil",
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
         }
     }
 }
 
 @Composable
-fun ItemTypeDropdown(
+fun ModernTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    leadingIcon: @Composable (() -> Unit)? = null,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        leadingIcon = leadingIcon,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Gold,
+            focusedLabelColor = Gold,
+            cursorColor = Gold
+        ),
+        shape = RoundedCornerShape(8.dp)
+    )
+}
+
+@Composable
+fun ItemTypeSelector(
     selectedItemType: ItemType,
     onItemTypeSelect: (ItemType) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    // İtem tipi için görünen isimler
-    val itemTypeNames = mapOf(
-        ItemType.TL to "Türk Lirası (TL)",
-        ItemType.CURRENCY to "Döviz",
+    val itemTypes = listOf(
+        ItemType.TL to "Türk Lirası (₺)",
+        ItemType.CURRENCY to "Döviz ($, €, £)",
         ItemType.GOLD to "Altın"
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(4.dp)
-            )
-            .clip(RoundedCornerShape(4.dp))
-            .clickable { expanded = true }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = itemTypeNames[selectedItemType] ?: "Seçiniz",
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Icon(Icons.Default.ArrowDropDown, contentDescription = "Açılır liste")
-        }
+    Column {
+        Text(
+            text = "Toplanacak Değer Türü",
+            style = MaterialTheme.typography.titleMedium,
+            color = NavyBlue,
+            fontWeight = FontWeight.Medium
+        )
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ItemType.values().forEach { itemType ->
-                DropdownMenuItem(
-                    text = { Text(itemTypeNames[itemType] ?: "") },
-                    onClick = {
-                        onItemTypeSelect(itemType)
-                        expanded = false
-                    }
+            itemTypes.forEach { (type, label) ->
+                SelectableChip(
+                    text = label,
+                    selected = type == selectedItemType,
+                    onClick = { onItemTypeSelect(type) },
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -460,52 +312,118 @@ fun ItemTypeDropdown(
 }
 
 @Composable
-fun DropdownSelector(
-    selectedValue: String,
-    options: List<String>,
-    onValueSelected: (String) -> Unit,
-    placeholder: String
+fun SelectableChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
+        color = if (selected) Gold else Color.Transparent,
+        border = BorderStroke(1.dp, if (selected) Gold else Color.Gray.copy(alpha = 0.5f))
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 12.dp, horizontal = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                color = if (selected) White else Color.Gray,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun SpecificItemSelector(
+    selectedItemType: ItemType,
+    selectedSpecificItem: String,
+    currencyOptions: List<String>,
+    goldOptions: List<String>,
+    onSpecificItemSelect: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(4.dp)
-            )
-            .clip(RoundedCornerShape(4.dp))
-            .clickable { expanded = true }
-    ) {
-        Row(
+    val title = if (selectedItemType == ItemType.CURRENCY) "Döviz Türü" else "Altın Türü"
+    val options = if (selectedItemType == ItemType.CURRENCY) {
+        currencyOptions.map { Constants.CurrencyCodes.getDisplayName(it) }
+    } else {
+        goldOptions.map { Constants.GoldCodes.getDisplayName(it) }
+    }
+
+    val selectedValue = if (selectedSpecificItem.isNotEmpty()) {
+        if (selectedItemType == ItemType.CURRENCY) {
+            Constants.CurrencyCodes.getDisplayName(selectedSpecificItem)
+        } else {
+            Constants.GoldCodes.getDisplayName(selectedSpecificItem)
+        }
+    } else ""
+
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = NavyBlue,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { expanded = true },
+            border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f))
         ) {
-            Text(
-                text = selectedValue.ifEmpty { placeholder },
-                color = if (selectedValue.isEmpty()) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                else MaterialTheme.colorScheme.onSurface
-            )
-            Icon(Icons.Default.ArrowDropDown, contentDescription = "Açılır liste")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = selectedValue.ifEmpty { "Seçiniz" },
+                    color = if (selectedValue.isEmpty()) Color.Gray.copy(alpha = 0.5f) else Color.DarkGray
+                )
+
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = Gold
+                )
+            }
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .background(White)
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option) },
                     onClick = {
-                        onValueSelected(option)
+                        val code = if (selectedItemType == ItemType.CURRENCY) {
+                            Constants.CurrencyCodes.getCodeFromDisplayName(option)
+                        } else {
+                            Constants.GoldCodes.getCodeFromDisplayName(option)
+                        }
+                        onSpecificItemSelect(code)
                         expanded = false
-                    }
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = NavyBlue
+                    )
                 )
             }
         }
@@ -513,7 +431,7 @@ fun DropdownSelector(
 }
 
 @Composable
-fun MonthYearSelector(
+fun ModernDateSelector(
     selectedMonth: Int,
     selectedYear: Int,
     onMonthSelected: (Int) -> Unit,
@@ -524,162 +442,278 @@ fun MonthYearSelector(
 
     val monthFormat = SimpleDateFormat("MMMM", Locale.getDefault())
     val calendar = Calendar.getInstance()
+    calendar.set(Calendar.MONTH, selectedMonth - 1)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Ay seçimi
-        Box(
+        // Month selector
+        Surface(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .clip(RoundedCornerShape(4.dp))
-                .clickable { showMonthDialog = true }
-                .padding(16.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { showMonthDialog = true },
+            border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f))
         ) {
-            calendar.set(Calendar.MONTH, selectedMonth - 1)
-            Text(
-                text = monthFormat.format(calendar.time),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        // Yıl seçimi
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .clip(RoundedCornerShape(4.dp))
-                .clickable { showYearDialog = true }
-                .padding(16.dp)
-        ) {
-            Text(
-                text = selectedYear.toString(),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-
-    // Ay seçim diyaloğu
-    if (showMonthDialog) {
-        Dialog(onDismissRequest = { showMonthDialog = false }) {
-            Card(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                shape = RoundedCornerShape(16.dp)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Ay Seçiniz",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                Text(
+                    text = monthFormat.format(calendar.time),
+                    color = Color.DarkGray
+                )
 
-                    Divider()
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = null,
+                    tint = Gold
+                )
+            }
+        }
 
-                    LazyColumn {
-                        items(12) { index ->
-                            val month = index + 1
-                            calendar.set(Calendar.MONTH, index)
-                            val monthName = monthFormat.format(calendar.time)
+        // Year selector
+        Surface(
+            modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { showYearDialog = true },
+            border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = selectedYear.toString(),
+                    color = Color.DarkGray
+                )
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onMonthSelected(month)
-                                        showMonthDialog = false
-                                    }
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = monthName,
-                                    modifier = Modifier.weight(1f)
-                                )
-
-                                if (month == selectedMonth) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = null,
-                                        tint = Secondary
-                                    )
-                                }
-                            }
-
-                            if (index < 11) {
-                                Divider()
-                            }
-                        }
-                    }
-                }
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    tint = Gold
+                )
             }
         }
     }
 
-    // Yıl seçim diyaloğu
+    // Month selection dialog
+    if (showMonthDialog) {
+        DateSelectorDialog(
+            title = "Ay Seçiniz",
+            options = (1..12).map {
+                calendar.set(Calendar.MONTH, it - 1)
+                monthFormat.format(calendar.time)
+            },
+            selectedIndex = selectedMonth - 1,
+            onOptionSelected = { index ->
+                onMonthSelected(index + 1)
+                showMonthDialog = false
+            },
+            onDismiss = { showMonthDialog = false }
+        )
+    }
+
+    // Year selection dialog
     if (showYearDialog) {
-        Dialog(onDismissRequest = { showYearDialog = false }) {
-            Card(
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        DateSelectorDialog(
+            title = "Yıl Seçiniz",
+            options = (0..9).map { (currentYear + it).toString() },
+            selectedIndex = selectedYear - currentYear,
+            onOptionSelected = { index ->
+                onYearSelected(currentYear + index)
+                showYearDialog = false
+            },
+            onDismiss = { showYearDialog = false }
+        )
+    }
+}
+
+@Composable
+fun DateSelectorDialog(
+    title: String,
+    options: List<String>,
+    selectedIndex: Int,
+    onOptionSelected: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = NavyBlue,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        containerColor = White,
+        text = {
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp)
+                    .heightIn(max = 300.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Yıl Seçiniz",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                items(options.size) { index ->
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onOptionSelected(index) }
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = options[index],
+                                color = if (index == selectedIndex) Gold else Color.DarkGray,
+                                fontWeight = if (index == selectedIndex) FontWeight.Bold else FontWeight.Normal
+                            )
 
-                    Divider()
-
-                    LazyColumn {
-                        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-                        items(10) { index ->
-                            val year = currentYear + index
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onYearSelected(year)
-                                        showYearDialog = false
-                                    }
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = year.toString(),
-                                    modifier = Modifier.weight(1f)
+                            if (index == selectedIndex) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = Gold
                                 )
-
-                                if (year == selectedYear) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = null,
-                                        tint = Secondary
-                                    )
-                                }
-                            }
-
-                            if (index < 9) {
-                                Divider()
                             }
                         }
+
+                        if (index < options.size - 1) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(Color.Gray.copy(alpha = 0.2f))
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Gold
+                )
+            ) {
+                Text("Kapat")
+            }
+        }
+    )
+}
+
+@Composable
+fun ParticipantsSection(
+    participants: List<Participant>,
+    onAddParticipant: (String) -> Unit,
+    onRemoveParticipant: (Participant) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+
+    Column {
+        Text(
+            text = "Katılımcılar (${participants.size})",
+            style = MaterialTheme.typography.titleMedium,
+            color = NavyBlue,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Participant entry field and add button
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Katılımcı Adı") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Gold,
+                focusedLabelColor = Gold,
+                cursorColor = Gold
+            ),
+            shape = RoundedCornerShape(8.dp),
+            singleLine = true,
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        if (name.isNotBlank()) {
+                            onAddParticipant(name)
+                            name = ""
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Ekle",
+                        tint = Gold
+                    )
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Participants list
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.2f))
+        ) {
+            if (participants.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "Henüz katılımcı eklenmedi",
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                LazyColumn {
+                    items(participants) { participant ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = participant.name,
+                                color = NavyBlue
+                            )
+
+                            IconButton(
+                                onClick = { onRemoveParticipant(participant) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Sil",
+                                    tint = Color.Red.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(Color.Gray.copy(alpha = 0.2f))
+                        )
                     }
                 }
             }
@@ -687,8 +721,11 @@ fun MonthYearSelector(
     }
 }
 
+
+// CONFIRM PART
+
 @Composable
-fun ConfirmDialog(
+fun ConfirmationDialog(
     state: GirisState,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -696,31 +733,42 @@ fun ConfirmDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Kura Bilgilerini Onaylayın")
+            Text(
+                "Kura Bilgilerini Onaylayın",
+                color = NavyBlue,
+                fontWeight = FontWeight.Bold
+            )
         },
+        containerColor = White,
         text = {
-            Column {
-                Text("Katılımcı Sayısı: ${state.participantCount}")
-
-                Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ConfirmationItem(
+                    label = "Katılımcı Sayısı",
+                    value = "${state.participants.size} kişi"
+                )
 
                 val valueTypeAndItem = when(state.selectedItemType) {
-                    ItemType.TL -> "Türk Lirası"
+                    ItemType.TL -> "Türk Lirası (₺)"
                     ItemType.CURRENCY -> "Döviz (${Constants.CurrencyCodes.getDisplayName(state.selectedSpecificItem)})"
                     ItemType.GOLD -> "Altın (${Constants.GoldCodes.getDisplayName(state.selectedSpecificItem)})"
                 }
 
-                Text("Toplanacak Değer: $valueTypeAndItem")
+                ConfirmationItem(
+                    label = "Toplanacak Değer",
+                    value = valueTypeAndItem
+                )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                ConfirmationItem(
+                    label = "Aylık Miktar",
+                    value = state.monthlyAmount
+                )
 
-                Text("Aylık Miktar: ${state.monthlyAmount}")
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text("Süre: ${state.durationMonths} ay")
-
-                Spacer(modifier = Modifier.height(8.dp))
+                ConfirmationItem(
+                    label = "Süre(Ay)",
+                    value = "${state.durationMonths} ay"
+                )
 
                 // Başlangıç ayı ve yılı
                 val monthFormat = SimpleDateFormat("MMMM", Locale.getDefault())
@@ -728,23 +776,104 @@ fun ConfirmDialog(
                 calendar.set(Calendar.MONTH, state.startMonth - 1)
                 val monthName = monthFormat.format(calendar.time)
 
-                Text("Başlangıç: $monthName ${state.startYear}")
+                ConfirmationItem(
+                    label = "Başlangıç",
+                    value = "$monthName ${state.startYear}"
+                )
             }
         },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
-                )
+                    containerColor = NavyBlue
+                ),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text("Onaylıyorum")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            OutlinedButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = NavyBlue
+                ),
+                border = BorderStroke(1.dp, NavyBlue),
+                shape = RoundedCornerShape(8.dp)
+            ) {
                 Text("İptal")
             }
         }
     )
 }
+
+@Composable
+fun ConfirmationItem(
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "$label:",
+            color = Color.Gray,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.width(120.dp)
+        )
+
+        Text(
+            text = value,
+            color = NavyBlue,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun LoadingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = White
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = Gold,
+                    modifier = Modifier.size(48.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Lütfen bekleyiniz...",
+                    color = NavyBlue,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
+    }
+
+
+}
+
+
+
+
+
+
+

@@ -125,8 +125,8 @@ class CarkViewModel @Inject constructor(
         val participants = _state.value.remainingParticipants
         if (participants.isEmpty()) return
 
-        // Açıyı 0-360 arasına normalize et
-        val normalizedAngle = (finalAngle % 360 + 360) % 360
+        // Son açı değerini normalize et (0-360 arasına getir)
+        val normalizedAngle = finalAngle % 360
 
         // Dilim açısını hesapla
         val sliceAngle = 360f / participants.size
@@ -134,7 +134,8 @@ class CarkViewModel @Inject constructor(
         // Log: Temel bilgiler
         Log.d("CarkViewModel", "Normalize Açı: $normalizedAngle°, Dilim Açısı: $sliceAngle°, Katılımcı Sayısı: ${participants.size}")
 
-        // KRİTİK DEĞİŞİKLİK: Açının hangi dilime denk geldiğini doğru hesapla
+        // KRİTİK DEĞIŞIKLIK: İşaretçi yukarıdadır (0 derece)
+        // Çark saat yönünde döner, bu nedenle açı 0'dan başlayarak saat yönünde artar
         // Her bir dilimin açı aralığını kontrol ederek kazananı bul
         var foundWinnerIndex = -1
         for (i in participants.indices) {
@@ -152,10 +153,10 @@ class CarkViewModel @Inject constructor(
             }
         }
 
-        // Hiçbir dilim bulunamadıysa (360 derece tam sınırda), son dilime düşmüş sayalım
+        // Hiçbir dilim bulunamadıysa (360 derece tam sınırda), ilk dilime düşmüş sayalım
         if (foundWinnerIndex == -1) {
-            foundWinnerIndex = participants.size - 1
-            Log.d("CarkViewModel", "Dilim bulunamadı, son dilim kullanılıyor: $foundWinnerIndex")
+            foundWinnerIndex = 0
+            Log.d("CarkViewModel", "Dilim bulunamadı, ilk dilim kullanılıyor: $foundWinnerIndex")
         }
 
         // Güvenlik kontrolü

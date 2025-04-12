@@ -1,9 +1,8 @@
 package com.mehmettekin.gunkurasiapp.presentation.screens.cark
 
 
-
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -13,10 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -40,6 +36,9 @@ import kotlin.math.sin
 import android.util.Log
 import kotlin.random.Random
 
+// Yardımcı uzantı fonksiyonu
+fun Float.degreesToRadians(): Float = this * PI.toFloat() / 180f
+
 @Composable
 fun WheelOfFortune(
     participants: List<Participant>,
@@ -50,9 +49,8 @@ fun WheelOfFortune(
 ) {
     if (participants.isEmpty()) return
 
-    // Dönüş açısı ve hedef açı
-    var currentRotation by remember { mutableFloatStateOf(0f) }
-    var targetRotation by remember { mutableFloatStateOf(0f) }
+    // Animasyon kontrolü için Animatable kullanıyoruz
+    val rotation = remember { Animatable(0f) }
 
     // Renkler listesi
     val segmentColors = remember {
@@ -73,50 +71,53 @@ fun WheelOfFortune(
     // Çarkı çevirme animasyonu
     LaunchedEffect(isSpinning) {
         if (isSpinning) {
+            // Eski değer
+            val currentValue = rotation.value
+
             // Rastgele dönüş için değerler
             val extraRotations = 5 + Random.nextInt(3) // 5-7 tur ekstra
             val randomAngle = Random.nextFloat() * 360f // Rastgele bir son açı
 
-            // Hedef açıyı belirle - mevcut açı + tam turlar + rastgele son açı
-            targetRotation = currentRotation + 360f * extraRotations + randomAngle
+            // Hedef açı - mevcut açı + tam turlar + rastgele son açı
+            val targetValue = currentValue + 360f * extraRotations + randomAngle
 
             // DEBUG için loglama
-            Log.d("WheelOfFortune", "Mevcut: $currentRotation, Hedef: $targetRotation, Ekstra turlar: $extraRotations, Rastgele açı: $randomAngle")
+            Log.d("WheelOfFortune", "Mevcut: $currentValue, Hedef: $targetValue, Ekstra turlar: $extraRotations, Rastgele açı: $randomAngle")
+
+            // Animasyonu başlat
+            rotation.animateTo(
+                targetValue = targetValue,
+                animationSpec = tween(
+                    durationMillis = 5000,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+
+            // Animasyon tamamlandığında hesaplamalar
+            val finalRotation = rotation.value
+
+            // İşaretçi yukarıda (0 derece)
+            // Çark saat yönünde dönerken, işaretçinin pozisyonu sabit kalır
+            // Normalize edilmiş açıyı hesaplarken, son açıyı modulo alıyoruz (0-360 arası)
+            val normalizedAngle = finalRotation % 360
+
+            // Kazanan dilimi ve katılımcıyı logla
+            Log.d("WheelOfFortune", "Animasyon bitti. Son açı: $normalizedAngle°")
+
+            // Her dilimin açı aralığını logla
+            for (i in participants.indices) {
+                val startAngle = i * sliceAngle
+                val endAngle = (i + 1) * sliceAngle
+                Log.d("WheelOfFortune", "Dilim $i (${participants[i].name}): $startAngle° - $endAngle°")
+            }
+
+            // Son açıyı ViewModel'e gönder
+            onRotationComplete(normalizedAngle)
+
+            // Animasyon tamamlandı bilgisini gönder
+            onAnimationComplete()
         }
     }
-
-    // Dönüş animasyonu
-    val rotation by animateFloatAsState(
-        targetValue = if (isSpinning) targetRotation else currentRotation,
-        animationSpec = tween(
-            durationMillis = if (isSpinning) 5000 else 0,
-            easing = LinearOutSlowInEasing
-        ),
-        finishedListener = { finalRotation ->
-            if (isSpinning) {
-                // Son dönüş açısını güncelle
-                currentRotation = finalRotation % 360
-                targetRotation = currentRotation
-
-                // Normalize edilmiş açıyı hesapla ve ilet (0-360 arası)
-                val normalizedAngle = (currentRotation % 360 + 360) % 360
-
-                // Kazanan dilimi belirlemek için tüm dilimleri logla
-                Log.d("WheelOfFortune", "Animasyon bitti. Son açı: $normalizedAngle°")
-
-                // Her dilimin açı aralığını logla
-                for (i in participants.indices) {
-                    val startAngle = i * sliceAngle
-                    val endAngle = (i + 1) * sliceAngle
-                    Log.d("WheelOfFortune", "Dilim $i (${participants[i].name}): $startAngle° - $endAngle°")
-                }
-
-                // Son dönüş açısını ve animasyon tamamlandı olayını ilet
-                onRotationComplete(normalizedAngle)
-                onAnimationComplete()
-            }
-        }
-    )
 
     // Metin ölçümü için
     val textMeasurer = rememberTextMeasurer()
@@ -144,7 +145,7 @@ fun WheelOfFortune(
             )
 
             // 2. Çarkı döndür
-            rotate(degrees = rotation, pivot = center) {
+            rotate(degrees = rotation.value, pivot = center) {
                 // 3. Her katılımcı için bir dilim çiz
                 participants.forEachIndexed { index, participant ->
                     // Başlangıç açısı
@@ -174,7 +175,7 @@ fun WheelOfFortune(
                     )
 
                     // 3.3. Dilim merkezindeki metin pozisyonunu hesapla
-                    val textAngle = (startAngle + sliceAngle / 2f) * PI.toFloat() / 180f
+                    val textAngle = (startAngle + sliceAngle / 2f).degreesToRadians()
                     val textRadius = radius * 0.65f // Metni yarıçapın %65'ine yerleştir
                     val textX = center.x + textRadius * cos(textAngle)
                     val textY = center.y + textRadius * sin(textAngle)
@@ -186,17 +187,17 @@ fun WheelOfFortune(
                         participant.name
                     }
 
-                    // 3.5. Metin stilini ve ölçülerini belirle - Shadow olmadan
+                    // 3.5. Metin stilini ve ölçülerini belirle
                     val textLayout = textMeasurer.measure(
                         text = displayText,
                         style = TextStyle(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black // Siyah metin rengi kullanılıyor
+                            color = Color.Black
                         )
                     )
 
-                    // 3.6. Metni çiz - Shadow olmadan sadece tek bir metin çizimi
+                    // 3.6. Metni çiz
                     drawText(
                         textLayoutResult = textLayout,
                         topLeft = Offset(
@@ -214,11 +215,11 @@ fun WheelOfFortune(
                 center = center
             )
 
-            // 5. İşaretçi (sabit - yukarıda 0 derecede)
+            // 5. İşaretçi (sabit) - YUKARIDA (0 derece)
             val pointerPath = Path().apply {
-                moveTo(center.x, 20.dp.toPx())
-                lineTo(center.x - 10.dp.toPx(), 0f)
-                lineTo(center.x + 10.dp.toPx(), 0f)
+                moveTo(center.x, 20.dp.toPx())  // İşaretçi ucu (yukarı)
+                lineTo(center.x - 10.dp.toPx(), 0f)  // Sol kenar
+                lineTo(center.x + 10.dp.toPx(), 0f)  // Sağ kenar
                 close()
             }
 

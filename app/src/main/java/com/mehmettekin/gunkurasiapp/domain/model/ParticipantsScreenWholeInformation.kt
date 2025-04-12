@@ -1,6 +1,6 @@
 package com.mehmettekin.gunkurasiapp.domain.model
 
-data class DrawSettings(
+data class ParticipantsScreenWholeInformation(
     val participantCount: Int,
     val participants: List<Participant>,
     val itemType: ItemType,

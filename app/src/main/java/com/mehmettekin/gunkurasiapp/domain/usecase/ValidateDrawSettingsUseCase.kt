@@ -1,14 +1,14 @@
 package com.mehmettekin.gunkurasiapp.domain.usecase
 
 import com.mehmettekin.gunkurasiapp.R
-import com.mehmettekin.gunkurasiapp.domain.model.DrawSettings
+import com.mehmettekin.gunkurasiapp.domain.model.ParticipantsScreenWholeInformation
 import com.mehmettekin.gunkurasiapp.domain.model.ItemType
 import com.mehmettekin.gunkurasiapp.util.ResultState
 import com.mehmettekin.gunkurasiapp.util.UiText
 import javax.inject.Inject
 
 class ValidateDrawSettingsUseCase @Inject constructor() {
-    operator fun invoke(settings: DrawSettings): ResultState<DrawSettings> {
+    operator fun invoke(settings: ParticipantsScreenWholeInformation): ResultState<ParticipantsScreenWholeInformation> {
         // Validate participant count
         if (settings.participantCount <= 0) {
             return ResultState.Error(UiText.stringResource(R.string.error_invalid_participant_count))
